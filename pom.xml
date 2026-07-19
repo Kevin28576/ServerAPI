@@ -104,6 +104,19 @@
                 <version>3.5.1</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <!--
+                        丟掉相依套件自己的 META-INF。不排除的話 shade 會警告
+                        MANIFEST.MF 重疊；簽章檔（.SF/.DSA/.RSA）留著更糟，
+                        內容經過重新命名後對不上，執行期會直接拋出驗證失敗。
+                    -->
+                    <filters>
+                        <filter>
+                            <artifact>org.bstats:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
