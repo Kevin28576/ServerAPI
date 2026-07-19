@@ -22,6 +22,7 @@ console:
   network-on: " &8| &across-server heartbeat active"
   network-no-redis: " &8| &cenabled but Redis missing"
 
+  docs: "Documentation: {0}"
   uptime-days: "{0}d {1}h {2}m"
   uptime-hours: "{0}h {1}m {2}s"
   uptime-minutes: "{0}m {1}s"
@@ -94,11 +95,14 @@ console:
     auth-default-key: "auth.api-key is still the bundled default. Anyone who has read the docs knows it. Replace it with a long random value."
     auth-weak-key: "auth.api-key is only {0} characters. Use at least 16 random characters, since the key travels with every request."
     lang-switch-failed: "Language switch failed: {0}"
+    metrics-failed: "bStats metrics failed to start: {0}"
     proxy-parse-failed: "Could not parse trusted proxy entry, skipping: {0}"
     lang-missing: "Language file not found: {0}, falling back to {1}"
 
 command:
   description: "ServerAPI control command (reload / info / lang)"
+  docs: "&b[ServerAPI] &fDocumentation: &n{0}"
+  docs-hover: "Click to open in your browser"
   usage: "&b[ServerAPI] &fUsage: /serverapi <reload|info|lang>"
   status: "&b[ServerAPI] &fStatus: {0}"
   running: "&arunning"

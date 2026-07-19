@@ -1,8 +1,10 @@
 # ServerAPI
 
+**繁體中文** · [English](README_EN.md)
+
 一套 REST API，讓網站、Discord bot 與監控面板讀取 Minecraft 伺服器的即時資料。
 
-**繁體中文** · [English](README_EN.md)
+![ServerAPI](banner.png)
 
 [![Paper](https://img.shields.io/badge/Paper-26.1-blue)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange)](https://adoptium.net)

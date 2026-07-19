@@ -58,6 +58,7 @@ public abstract class ApiHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try (exchange) {
+            plugin.countRequest();
             // CORS：允許瀏覽器端讀取
             exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant" data-lang="zh" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rate limiting and proxies · ServerAPI</title>
+<meta name="description" content="Token bucket: credit refills at a fixed rate and short bursts are allowed, but sustained overuse returns 429 with a Retry-After header. The default is">
+<link rel="icon" type="image/png" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ServerAPI">
+<meta property="og:title" content="Rate limiting and proxies · ServerAPI">
+<meta property="og:description" content="Token bucket: credit refills at a fixed rate and short bursts are allowed, but sustained overuse returns 429 with a Retry-After header. The default is">
+<meta property="og:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rate limiting and proxies · ServerAPI">
+<meta name="twitter:description" content="Token bucket: credit refills at a fixed rate and short bursts are allowed, but sustained overuse returns 429 with a Retry-After header. The default is">
+<meta name="twitter:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
+<meta name="theme-color" content="#4cc2ff">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="top"><div class="top-in">
+  <button class="menu" id="menu" aria-label="Menu">☰</button>
+  <a class="brand" href="../"><img src="../assets/icon.png" alt="" width="22" height="22">
+    ServerAPI<span class="v">v1.0.0</span></a>
+  <div class="search">
+    <input id="q" type="search" autocomplete="off">
+    <div id="results"></div>
+  </div>
+  <div class="langs">
+    <button data-set="zh">中文</button>
+    <button data-set="en">English</button>
+  </div>
+</div></header>
+
+<div class="layout">
+  <aside id="side">
+<div class="grp"><span class="zh">開始</span><span class="en">Getting started</span></div>
+<a href="../"><span class="zh">總覽</span><span class="en">Overview</span></a>
+<a href="../install/"><span class="zh">安裝</span><span class="en">Installation</span></a>
+<div class="grp"><span class="zh">API</span><span class="en">API</span></div>
+<a href="../endpoints/"><span class="zh">端點</span><span class="en">Endpoints</span></a>
+<a href="../response/"><span class="zh">回應格式</span><span class="en">Response format</span></a>
+<div class="grp"><span class="zh">安全</span><span class="en">Security</span></div>
+<a href="../auth/"><span class="zh">驗證與權限</span><span class="en">Authentication</span></a>
+<a href="../ratelimit/" class="on"><span class="zh">速率限制與反向代理</span><span class="en">Rate limiting and proxies</span></a>
+<div class="grp"><span class="zh">功能</span><span class="en">Features</span></div>
+<a href="../punishments/"><span class="zh">處罰紀錄</span><span class="en">Punishment records</span></a>
+<a href="../web/"><span class="zh">網頁介面</span><span class="en">Web pages</span></a>
+<a href="../storage/"><span class="zh">資料儲存</span><span class="en">Storage</span></a>
+<a href="../network/"><span class="zh">多服</span><span class="en">Multi-server</span></a>
+<a href="../i18n/"><span class="zh">多語言</span><span class="en">Languages</span></a>
+<div class="grp"><span class="zh">參考</span><span class="en">Reference</span></div>
+<a href="../commands/"><span class="zh">指令與權限</span><span class="en">Commands and permissions</span></a>
+<a href="../integrations/"><span class="zh">第三方整合</span><span class="en">Integrations</span></a>
+<a href="../troubleshooting/"><span class="zh">疑難排解</span><span class="en">Troubleshooting</span></a>
+  </aside>
+  <main>
+    <article>
+
+      <h1><span class="zh">速率限制與反向代理</span><span class="en">Rate limiting and proxies</span></h1>
+      <div class="zh"><p>採 token bucket：以固定速率補充額度，容許短暫叢發，持續超量時回 <code>429</code> 並附
+<code>Retry-After</code> 標頭。預設每個來源 IP 每分鐘 120 次、突發 30 次。</p>
+<pre><code>rate-limit:
+  enabled: true
+  per-ip-per-minute: 120
+  burst: 30
+  global-per-minute: 0      # 所有來源合計，0 = 不限
+  exempt-authenticated: true
+  exempt-ips: ["127.0.0.1"]</code></pre>
+<h3 id="zh-反向代理後方">反向代理後方</h3>
+<p>掛在 Cloudflare／Nginx／Apache 後方時，所有訪客的來源都會是代理主機，速率限制與 IP 豁免都會失準。
+開啟後改從代理標頭取得真實 IP：</p>
+<pre><code>real-ip:
+  enabled: true
+  trusted-proxies:
+    - "cloudflare"        # 展開為官方公布的所有區段
+    - "127.0.0.1/32"</code></pre>
+<div class="note">
+  代理標頭可由用戶端任意偽造，因此<b>只有當連線來源本身屬於 <code>trusted-proxies</code> 時才會被採信</b>。
+  <code>X-Forwarded-For</code> 由右往左掃描，略過可信代理後取第一個非可信位址 ——
+  直接取最左邊會被偽造的前綴欺騙。
+</div></div>
+      <div class="en"><p>Token bucket: credit refills at a fixed rate and short bursts are allowed, but sustained overuse
+returns <code>429</code> with a <code>Retry-After</code> header. The default is 120 requests per
+minute per source IP with a burst of 30.</p>
+<pre><code>rate-limit:
+  enabled: true
+  per-ip-per-minute: 120
+  burst: 30
+  global-per-minute: 0      # across all sources, 0 = unlimited
+  exempt-authenticated: true
+  exempt-ips: ["127.0.0.1"]</code></pre>
+<h3 id="en-behind-a-reverse-proxy">Behind a reverse proxy</h3>
+<p>Behind Cloudflare, Nginx or Apache every visitor appears to come from the proxy, which throws off
+both rate limiting and IP exemptions. Turn this on to read the real address from proxy headers:</p>
+<pre><code>real-ip:
+  enabled: true
+  trusted-proxies:
+    - "cloudflare"        # expands to every published range
+    - "127.0.0.1/32"</code></pre>
+<div class="note">
+  Proxy headers are trivially forged, so <b>they are only trusted when the connection itself comes
+  from <code>trusted-proxies</code></b>. <code>X-Forwarded-For</code> is scanned right to left,
+  skipping trusted proxies to reach the first address that is not one — taking the leftmost entry
+  would be fooled by a forged prefix.
+</div></div>
+    </article>
+<div class="pager"><a class="prev" href="../auth/"><small><i>←</i><span class="zh">上一頁</span><span class="en">Previous</span></small><b><span class="zh">驗證與權限</span><span class="en">Authentication</span></b></a><a class="next" href="../punishments/"><small><span class="zh">下一頁</span><span class="en">Next</span><i>→</i></small><b><span class="zh">處罰紀錄</span><span class="en">Punishment records</span></b></a></div>
+    <footer>
+      <div class="zh">ServerAPI · 僅供非商業用途，商業伺服器需另行取得授權。</div>
+      <div class="en">ServerAPI · Free for non-commercial use; commercial servers need a separate licence.</div>
+      <div class="copy">Copyright © 2021-2026 CloudXact Studio. All Rights Reserved.</div>
+    </footer>
+  </main>
+  <nav class="toc" id="toc"><div class="zh"><div class="toc-t">本頁內容</div><a href="#zh-反向代理後方" data-h="zh-反向代理後方" class="lv3">反向代理後方</a></div><div class="en"><div class="toc-t">On this page</div><a href="#en-behind-a-reverse-proxy" data-h="en-behind-a-reverse-proxy" class="lv3">Behind a reverse proxy</a></div></nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<script src="../assets/app.js"></script>
+</body>
+</html>

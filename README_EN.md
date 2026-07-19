@@ -1,8 +1,10 @@
 # ServerAPI
 
+[繁體中文](README.md) · **English**
+
 A REST API allowing websites, Discord bots and dashboards to read live data from your Minecraft server.
 
-[繁體中文](README.md) · **English**
+![ServerAPI](banner.png)
 
 [![Paper](https://img.shields.io/badge/Paper-26.1-blue)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange)](https://adoptium.net)

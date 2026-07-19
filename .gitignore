@@ -46,3 +46,6 @@ config.backup-*.yml
 # ── 本機測試 ──
 server/
 run/
+
+# ── 腳本工具 ──
+tools/

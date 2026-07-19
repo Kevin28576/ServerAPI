@@ -42,7 +42,13 @@ import kevin.serverapi.storage.SqlStatCache;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimpleBarChart;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -69,6 +75,19 @@ public final class ServerAPIPlugin extends JavaPlugin {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
     private static final String SEP = "─".repeat(74);
 
+    /** 教學文檔。主控台與指令都會附上，讓服主不必回頭找連結。 */
+    private static final String DOCS_URL = "https://cloudxact.com/wiki/serverapi/";
+
+    /**
+     * bStats 專案編號，於 bstats.org 註冊插件後取得。填錯會把資料送到別人的圖表上，
+     * 因此無效時直接跳過統計。
+     *
+     * 刻意不加 final：宣告成 static final 的字面常數時，{@code id <= 0} 會成為
+     * 編譯期常數，javac 會把 setupMetrics() 後半段當成不可達程式碼整段消除，
+     * 連 bStats 的類別參照都不會留下，shade 的重新命名也就無從套用。
+     */
+    private static int BSTATS_PLUGIN_ID = 32748;
+
     private HttpServer httpServer;
     private ExecutorService executor;
     /** 每個快照站點各自的定期任務（各有獨立間隔），外加 onlineCount 更新任務。 */
@@ -85,6 +104,14 @@ public final class ServerAPIPlugin extends JavaPlugin {
     private final Set<String> protectedPaths = new java.util.HashSet<>();
     private long enabledAt;
     private int stationCount;
+    /** 已啟用的站點名稱，供 bStats 統計哪些端點實際被使用。 */
+    private volatile Set<String> enabledStationNames = Set.of();
+    /**
+     * 累計請求數。bStats 每次取樣後歸零，圖表呈現的是該區間的請求量 ——
+     * 這是唯一能區分「裝了」與「真的在用」的指標。
+     */
+    private final java.util.concurrent.atomic.AtomicLong requestCount =
+            new java.util.concurrent.atomic.AtomicLong();
 
     /** 共用儲存層：資料庫連線池與 Redis 由插件統一管理生命週期。 */
     private SqlDatabase database;
@@ -125,6 +152,74 @@ public final class ServerAPIPlugin extends JavaPlugin {
         setupLanguage();
         registerCommands();
         startHttp();
+        setupMetrics();
+    }
+
+    /**
+     * bStats 匿名統計。伺服器管理員可在 plugins/bStats/config.yml 全域關閉。
+     * 統計失敗不影響插件運作，因此整段包在 try 裡。
+     */
+    private void setupMetrics() {
+        if (BSTATS_PLUGIN_ID <= 0) return;
+        try {
+            Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID);
+
+            // ── 每台伺服器只有一個值：用圓餅圖看佔比 ──
+            metrics.addCustomChart(new SimplePie("storage_type",
+                    () -> getConfig().getString("storage.type", "sqlite")));
+            metrics.addCustomChart(new SimplePie("language", () -> lang.code()));
+
+            // 這裡刻意不統計任何防護措施的開關（驗證、限流、真實來源 IP）。
+            // bStats 頁面是公開的：彙總過後雖然找不出「哪一台」沒設防，
+            // 但「這個插件多少比例的使用者不設防」本身就是攻擊者評估
+            // 值不值得針對本插件寫掃描器的依據，代價高於這點情報的價值。
+            // 想知道服主有沒有開驗證，看啟動警告的回報就夠了。
+
+            // ── 一台伺服器可同時符合多項：用長條圖看「各項各有多少服採用」 ──
+            //
+            // 這裡刻意不用進階圓餅圖。圓餅圖的前提是各部分構成一個整體，
+            // 但這些項目彼此獨立、且一台伺服器會同時符合多項 ——
+            // 16 個端點畫成餅圖就是 16 片幾乎等大的扇形，看不出差異，
+            // 「status 佔所有端點的 6.4%」這句話本身也沒有意義。
+            // 想知道的是「每項各有多少伺服器採用」，那是排名比較，長條圖才讀得出來。
+            metrics.addCustomChart(new SimpleBarChart("enabled_stations", () -> {
+                Map<String, Integer> map = new LinkedHashMap<>();
+                for (String name : enabledStationNames) map.put(name, 1);
+                return map;
+            }));
+            metrics.addCustomChart(new SimpleBarChart("integrations", () -> {
+                Map<String, Integer> map = new LinkedHashMap<>();
+                for (String name : new String[]{"LuckPerms", "CMI", "Vault",
+                        "DiscordSRV", "PlaceholderAPI"}) {
+                    var p = Bukkit.getPluginManager().getPlugin(name);
+                    if (p != null && p.isEnabled()) map.put(name, 1);
+                }
+                if (map.isEmpty()) map.put("None", 1);
+                return map;
+            }));
+            metrics.addCustomChart(new SimpleBarChart("optional_features", () -> {
+                Map<String, Integer> map = new LinkedHashMap<>();
+                // 同上：限流與真實來源 IP 屬於防護措施，一併不統計
+                if (redis != null) map.put("Redis", 1);
+                if (network != null && network.isEnabled()) map.put("Multi-server", 1);
+                if (getConfig().getBoolean("web.docs", false)) map.put("Docs page", 1);
+                if (punishmentsHtml) map.put("Punishments page", 1);
+                if (placeholdersList) map.put("PlaceholderAPI page", 1);
+                if (getConfig().getBoolean("punishment-log.enabled", true)) {
+                    map.put("Punishment log", 1);
+                }
+                if (map.isEmpty()) map.put("None", 1);
+                return map;
+            }));
+
+            // ── 唯一隨時間變化的量：折線圖 ──
+            // 取樣後歸零，圖上呈現的是該區間的請求數。安裝量看預設圖表就好，
+            // 這張回答的是完全不同的問題：裝了之後到底有沒有人在打。
+            metrics.addCustomChart(new SingleLineChart("api_requests",
+                    () -> (int) Math.min(Integer.MAX_VALUE, requestCount.getAndSet(0))));
+        } catch (Throwable t) {
+            getLogger().warning(lang.get("console.warn.metrics-failed", t));
+        }
     }
 
     @Override
@@ -352,6 +447,10 @@ public final class ServerAPIPlugin extends JavaPlugin {
         }
 
         stationCount = enabledStations.size();
+        // 只留站點名，不含路徑前綴，圖表標籤才讀得懂
+        enabledStationNames = enabledStations.keySet().stream()
+                .map(path -> path.substring(path.lastIndexOf('/') + 1))
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
         printEnableBanner(bind, port, basePath, enabledStations.size(), System.currentTimeMillis() - t0);
     }
 
@@ -684,6 +783,11 @@ public final class ServerAPIPlugin extends JavaPlugin {
         return placeholdersList;
     }
 
+    /** 供 ApiHandler 於每次請求時累加。 */
+    public void countRequest() {
+        requestCount.incrementAndGet();
+    }
+
     public boolean isDebug() {
         return debug;
     }
@@ -733,6 +837,7 @@ public final class ServerAPIPlugin extends JavaPlugin {
         console(lang.get("console.server-identity", serverLabel + clusterLabel + netState));
         console(lang.get("console.language", lang.code()));
         console(lang.get("console.debug-mode", debug ? lang.get("console.enabled") : lang.get("console.not-enabled")));
+        console(lang.get("console.docs", "&f" + DOCS_URL));
         console(lang.get("console.enabled-success", ver));
         console("&b" + SEP);
     }
@@ -1049,6 +1154,7 @@ public final class ServerAPIPlugin extends JavaPlugin {
         send(sender, lang.get("command.status",
                 httpServer != null ? lang.get("command.running") : lang.get("command.stopped")));
         send(sender, lang.get("command.usage"));
+        sendDocs(sender);
     }
 
     private void doLangInfo(CommandSender sender) {
@@ -1118,6 +1224,18 @@ public final class ServerAPIPlugin extends JavaPlugin {
     /** 以 & 色碼傳送訊息給指令發送者。 */
     private void send(CommandSender sender, String message) {
         sender.sendMessage(LEGACY.deserialize(message));
+    }
+
+    /**
+     * 文檔連結。遊戲內可直接點開，主控台則顯示純網址讓人複製。
+     * 兩者共用同一則語言字串，只差在有沒有掛上點擊事件。
+     */
+    private void sendDocs(CommandSender sender) {
+        Component line = LEGACY.deserialize(lang.get("command.docs", DOCS_URL))
+                .clickEvent(ClickEvent.openUrl(DOCS_URL))
+                .hoverEvent(HoverEvent.showText(
+                        LEGACY.deserialize(lang.get("command.docs-hover"))));
+        sender.sendMessage(line);
     }
 
     private void doReload(CommandSender sender) {

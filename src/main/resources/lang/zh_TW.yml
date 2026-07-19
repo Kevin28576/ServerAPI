@@ -22,6 +22,7 @@ console:
   network-on: " &8| &a跨服心跳已啟用"
   network-no-redis: " &8| &c已啟用但缺少 Redis"
 
+  docs: "教學文檔：{0}"
   uptime-days: "{0}天 {1}小時 {2}分"
   uptime-hours: "{0}小時 {1}分 {2}秒"
   uptime-minutes: "{0}分 {1}秒"
@@ -94,11 +95,14 @@ console:
     auth-default-key: "auth.api-key 仍是範本附的預設值，看過說明的人都知道這串。請換成一組夠長的隨機字串。"
     auth-weak-key: "auth.api-key 只有 {0} 個字元。金鑰會隨每次請求傳送，建議至少 16 個隨機字元。"
     lang-switch-failed: "語言切換失敗: {0}"
+    metrics-failed: "bStats 統計啟動失敗：{0}"
     proxy-parse-failed: "無法解析可信代理位址，已略過: {0}"
     lang-missing: "找不到語言檔: {0}，改用 {1}"
 
 command:
   description: "ServerAPI 控制指令 (reload / info / lang)"
+  docs: "&b[ServerAPI] &f教學文檔：&n{0}"
+  docs-hover: "點擊以在瀏覽器開啟"
   usage: "&b[ServerAPI] &f用法: /serverapi <reload|info|lang>"
   status: "&b[ServerAPI] &f狀態: {0}"
   running: "&a運作中"
