@@ -1,0 +1,38 @@
+# 預設由 Git 自行判斷文字檔並在簽入時正規化為 LF。
+* text=auto eol=lf
+
+# ── 一律 LF ──
+# 設定檔範本由插件在執行期複製給伺服器，YAML 對行尾敏感，
+# 若在 Windows 上被轉成 CRLF，複製出去的檔案會夾帶 \r。
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.java   text eol=lf
+*.xml    text eol=lf
+*.md     text eol=lf
+*.json   text eol=lf
+*.sql    text eol=lf
+*.properties text eol=lf
+.gitattributes text eol=lf
+.gitignore     text eol=lf
+LICENSE        text eol=lf
+
+# ── 指令碼 ──
+*.sh  text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# ── 二進位，不做任何轉換與差異比對 ──
+*.jar   binary
+*.zip   binary
+*.db    binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+
+# ── GitHub 語言統計 ──
+# 語言檔與設定範本不是程式碼，計入統計會讓語言比例失真。
+src/main/resources/lang/*.yml   linguist-language=YAML linguist-detectable=false
+src/main/resources/config*.yml  linguist-language=YAML linguist-detectable=false

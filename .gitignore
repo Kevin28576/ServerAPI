@@ -1,0 +1,48 @@
+# ── 建置產物 ──
+target/
+build/
+out/
+*.jar
+*.class
+
+# ── Maven ──
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ── IDE ──
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+nbproject/
+
+# ── 作業系統 ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── 執行期產物 ──
+# 這些是插件在伺服器上跑出來的東西，不該進版控。
+# config.yml 的「範本」在 src/main/resources/，那份要提交。
+plugins/
+logs/
+*.log
+history.db
+*.db-shm
+*.db-wal
+config.backup-*.yml
+
+# ── 本機測試 ──
+server/
+run/

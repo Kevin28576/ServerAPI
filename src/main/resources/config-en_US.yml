@@ -1,0 +1,280 @@
+#
+#   ServerAPI  ·  Minecraft server data over a REST API
+#
+#   Endpoint   /api/v1/{station}     alias /api/{station} always points at the latest
+#   Response   { ok, data, meta }
+#   Docs       http://<host>:<port>/api/docs      (requires web.docs)
+#
+
+# Language
+# ──────────────────────────────────────────────────────────────
+# auto = detect from the host locale and write the result back on first start.
+# Bundled: en_US, zh_TW. Switch with /serverapi lang <code> — the config is backed up
+# and rebuilt from the new template with every value preserved.
+language: "auto"
+
+
+# HTTP server
+# ──────────────────────────────────────────────────────────────
+http:
+  bind-address: "0.0.0.0"     # 0.0.0.0 public · 127.0.0.1 local only
+  port: 8080                  # Avoid clashing with the game port 25565
+  base-path: "/api"
+  threads: 8                  # Stations read from cache; 8-16 suits a public server
+
+# Log every request to the console and push it to players with serverapi.notice
+debug: false
+
+
+# Stations
+# ──────────────────────────────────────────────────────────────
+# Disabled stations are not registered and return 404.
+stations:
+  # Server
+  server: true          # /server         Version, MOTD, max players, game mode
+  performance: true     # /performance    TPS, memory, JVM
+  constants: true       # /constants      Static enums (game mode, difficulty, environment)
+
+  # Worlds
+  worlds: true          # /worlds         World list and detail /worlds/{name}
+  gamerules: true       # /gamerules      Game rules per world
+  entities: true        # /entities       Entity counts per world, players excluded
+  spawnlimits: true     # /spawnlimits    Spawn limits and intervals per world
+
+  # Players
+  status: true          # /status         Online UUIDs and count ?history=true
+  player: true          # /player/{uuid}  Single player ?detailed=true
+  punishments: true     # /punishments    Punishment records ?view=html
+  bans: true            # /bans           Ban list, player UUIDs and IPs
+  operators: true       # /operators      Operator list
+  whitelist: true       # /whitelist      Whitelist state and entries
+
+  # Other
+  plugins: true         # /plugins        Installed plugin list
+  placeholders: true    # /placeholders   PlaceholderAPI resolution ?list=true
+  network: true         # /network        Cross-server aggregation, needs multi-server + Redis
+
+
+# Web pages
+# ──────────────────────────────────────────────────────────────
+# Three HTML pages, handy to embed in your website but they also lay the content
+# out in full for anyone who opens them. When off the path / parameter returns 404;
+# the JSON endpoints are unaffected.
+web:
+  docs: false           # /api/docs                 Interactive API docs and try-it
+  punishments: false    # /punishments?view=html    Punishment records demo page
+  placeholders: false   # /placeholders?list=true   PlaceholderAPI preview page
+
+
+# API key
+# ──────────────────────────────────────────────────────────────
+# Sent as the X-API-Key header. When enabled is false the whole check is off and
+# every endpoint and field is public.
+auth:
+  enabled: false
+  api-key: "change-me"
+  allow-query-key: true       # Also accept ?key=xxx, handy for browser testing
+  hide-protected: true        # Answer 404 instead of 401, hiding that the path exists
+
+  # Endpoints that need a key. Anything not listed defaults to true, so a new
+  # station is never public by accident.
+  require-key:
+    index: false
+
+    server: true
+    performance: true
+    constants: true
+
+    worlds: true
+    gamerules: true
+    entities: true
+    spawnlimits: true
+
+    status: false
+    player: false
+    punishments: true
+    bans: true
+    operators: true
+    whitelist: true
+
+    plugins: true
+    placeholders: true
+    network: true
+
+    docs: false
+
+  # Fields kept hidden even on public endpoints. Names match at any depth.
+  # meta.hiddenFields lists what was removed so callers know why data is missing.
+  protected-fields:
+    server: ["motd", "ip", "port"]
+    worlds: ["seed"]
+    status: []
+    # op and banned are key-protected on /operators and /bans; leaving them here is
+    # a back door: read online UUIDs from the public /status, then query /player one
+    # by one to rebuild both lists.
+    player: ["op", "banned", "discord"]
+
+
+# Rate limiting
+# ──────────────────────────────────────────────────────────────
+# Token bucket: credit refills at a fixed rate and short bursts are allowed, but
+# sustained overuse returns 429 with a Retry-After header.
+rate-limit:
+  enabled: true
+  per-ip-per-minute: 120      # Ceiling for each source IP
+  burst: 30                   # Momentary burst (one page loading several endpoints)
+  global-per-minute: 0        # Ceiling across all sources, 0 = unlimited
+  exempt-authenticated: true  # Valid keys bypass the limit (requires auth.enabled)
+  exempt-ips:
+    - "127.0.0.1"
+
+
+# Real client IP
+# ──────────────────────────────────────────────────────────────
+# Behind a reverse proxy every visitor appears to come from the proxy, which throws
+# off rate limiting and IP exemptions. Headers are trivially forged, so they are only
+# trusted when the connection itself comes from trusted-proxies.
+real-ip:
+  enabled: false
+
+  # Single addresses and CIDR ranges. "cloudflare" expands to every published range.
+  # List only what you actually use — extra entries widen what can be spoofed.
+  trusted-proxies:
+    - "127.0.0.1/32"          # Nginx / Apache on this machine
+    - "::1/128"
+    # - "10.0.0.0/8"          # Internal proxy
+    # - "cloudflare"          # Uncomment when fronted by Cloudflare
+
+  # Tried in order, first valid value wins. X-Forwarded-For is a forwarding chain and
+  # is scanned right to left, skipping trusted proxies to reach the real client.
+  headers:
+    - "CF-Connecting-IP"      # Cloudflare
+    - "True-Client-IP"        # Cloudflare Enterprise / Akamai
+    - "X-Real-IP"             # Nginx convention
+    - "X-Forwarded-For"       # General standard
+
+
+# Snapshot intervals
+# ──────────────────────────────────────────────────────────────
+# Data that is only safe to read on the main thread is snapshotted there on a timer;
+# HTTP requests only ever read the cache, so traffic cannot drag down TPS.
+# Values are in ticks (20 ticks = 1 second). meta.cachedAt reports when each
+# snapshot was actually taken.
+cache:
+  status-ticks: 100           # 5s    online count, freshest and cheapest
+  entities-ticks: 400         # 20s   walks every entity, the expensive one
+  worlds-ticks: 12000         # 10m
+  gamerules-ticks: 12000      # 10m
+  spawnlimits-ticks: 12000    # 10m
+
+
+# Database
+# ──────────────────────────────────────────────────────────────
+# The single source of truth for history, stat cache and the punishment log.
+storage:
+  type: sqlite                # sqlite · mysql · mariadb
+  table-prefix: "serverapi_"
+
+  sqlite:
+    file: "history.db"        # Lives in plugins/ServerAPI/
+
+  sql:                        # Shared by mysql / mariadb
+    host: "localhost"
+    port: 3306
+    database: "serverapi"
+    username: "root"
+    password: ""
+    pool-size: 5
+
+
+# Redis (optional)
+# ──────────────────────────────────────────────────────────────
+# Reads prefer Redis; writes go to the database first, then overwrite Redis.
+# If Redis dies the plugin falls back to the database without interruption and
+# backfills on reconnect. Cross-server /network needs Redis. On a single server with
+# a remote Redis, the local database is usually faster.
+redis:
+  enabled: false
+  host: "localhost"
+  port: 6379
+  password: ""
+  database: 0
+  namespace: "serverapi"      # Key prefix
+
+
+# History
+# ──────────────────────────────────────────────────────────────
+# Powers /status?history=true.
+history:
+  enabled: true
+  update-interval-minutes: 10
+  retention-hours: 24
+
+
+# Offline player stat cache
+# ──────────────────────────────────────────────────────────────
+# Powers /player/{uuid}?detailed=true. Offline players require re-reading the stats
+# file (~425ms) while online players cost ~4ms, so only offline players are cached.
+# Entries live in Redis / the database and use no server memory.
+player-stat-cache:
+  enabled: true
+  ttl-seconds: 60
+
+
+# Punishment log
+# ──────────────────────────────────────────────────────────────
+# Neither Minecraft nor CMI keeps kick history, so this plugin listens for the events
+# and fills that gap. Events queue in memory and all database writes are async, so
+# TPS is unaffected. Only events after it was enabled can be recorded.
+punishment-log:
+  enabled: true
+  flush-seconds: 5
+  reconcile-seconds: 30       # How often to reconcile against the ban list / CMI
+  skip-kick-when-banned: true # The ban is already listed; skip the kick it triggers
+
+  # Days to keep, purged automatically. 0 or negative = keep forever (best for audits).
+  # Each row is a few hundred bytes and /punishments returns at most 500 records,
+  # so the response never grows with retention.
+  retention-days: 90
+
+  # Which kick reasons to record (PlayerKickEvent.Cause). The default covers real
+  # punishments only — TIMEOUT, IDLING and other connection issues do not count.
+  # Others: BANNED, IP_BANNED, WHITELIST, SPAM, FLYING_PLAYER, ILLEGAL_ACTION
+  kick-causes:
+    - KICK_COMMAND            # /kick command
+    - PLUGIN                  # Plugin-issued kicks (including CMI)
+
+
+# Third-party integrations
+# ──────────────────────────────────────────────────────────────
+# All optional. When a plugin is missing its fields are null and nothing else breaks.
+#   LuckPerms       rank on /player
+#   CMI             nickname, colours, playtime and AFK on /player
+#                   warnings, mutes and jails on /punishments
+#   Vault           balance on /player
+#   DiscordSRV      discord on /player, member count on /status
+#   PlaceholderAPI  the /placeholders station
+integrations:
+  luckperms:
+    # Timeout for offline rank lookups. This runs on an HTTP thread, so keeping it
+    # short stops slow queries from filling the pool.
+    timeout-ms: 1000
+
+  placeholderapi:
+    resolve-timeout-ms: 2000  # Resolution needs the main thread; 504 on timeout
+    strip-color: true         # Strip § colour codes from returned values
+
+
+# Multi-server
+# ──────────────────────────────────────────────────────────────
+# Several servers can share one Redis / database, separated by server-id. Servers on
+# the same cluster-id discover each other and /network aggregates the whole network.
+#
+#   Key      {namespace}:{cluster-id}:{server-id}:{type}[:{id}]
+#   Single   serverapi:::history
+#   Network  serverapi:main:survival:history
+network:
+  enabled: false              # Off means no heartbeat is published and /network is down
+  server-id: "global"         # global = treated as standalone. Must be unique per server
+  cluster-id: ""              # Same value groups servers; leave empty if unused
+  heartbeat-seconds: 10       # Missing 3 intervals marks a server offline

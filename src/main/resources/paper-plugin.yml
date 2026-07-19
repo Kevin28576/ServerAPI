@@ -1,0 +1,37 @@
+name: ServerAPI
+version: '${project.version}'
+main: kevin.serverapi.ServerAPIPlugin
+loader: kevin.serverapi.ServerAPILibraries
+api-version: '26.1'
+# 此欄由 Paper 顯示於 /plugins，屬靜態中繼資料，無法隨語言設定切換，故固定使用英文。
+description: A REST API allowing websites, Discord bots and dashboards to read live server data.
+authors:
+  - 'Kevi_28576'
+# paper-plugin.yml：此插件會顯示於 /plugins 的「Paper Plugins」區域。
+# 指令以 Paper 現代指令 API 於程式碼中註冊（paper-plugin.yml 不支援 commands 區塊）。
+# description 同樣由 Paper 直接顯示（/help、權限外掛的清單），無法本地化，一律英文。
+permissions:
+  serverapi.admin:
+    description: Use the /serverapi commands (info, reload, lang)
+    default: op
+  serverapi.notice:
+    description: Receive data request notifications while debug is enabled
+    default: op
+# 軟性相依：若有安裝 DiscordSRV，讓它先載入；未安裝也能正常運作。
+dependencies:
+  server:
+    DiscordSRV:
+      load: BEFORE
+      required: false
+    LuckPerms:
+      load: BEFORE
+      required: false
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+    Vault:
+      load: BEFORE
+      required: false
+    CMI:
+      load: BEFORE
+      required: false

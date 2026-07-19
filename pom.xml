@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>kevin.serverapi</groupId>
+    <artifactId>ServerAPI</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>ServerAPI</name>
+    <description>A REST API allowing websites, Discord bots and dashboards to read live data from your Minecraft server.</description>
+    <url>https://github.com/Kevin28576/ServerAPI</url>
+
+    <licenses>
+        <license>
+            <name>ServerAPI Non-Commercial License</name>
+            <url>https://github.com/Kevin28576/ServerAPI/blob/main/LICENSE</url>
+            <!-- manual：本專案不發布至公開 Maven 倉庫，且商業使用需另行取得授權 -->
+            <distribution>manual</distribution>
+            <comments>非商業用途可自由使用；商業伺服器須事先取得書面授權。</comments>
+        </license>
+    </licenses>
+
+    <properties>
+        <!-- Paper 26.x 需要 Java 21+；如你的環境是更新的 JDK 可自行調整 -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- 對齊伺服器版本：Paper 26.1.2 build 72 -->
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>26.1.2.build.72-stable</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- LuckPerms API（Maven Central）：用於查詢玩家 rank/primary group -->
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--
+            以下函式庫在「執行期」由 Paper 的 PluginLoader（ServerAPILibraries）
+            自 Maven 下載並加入 classpath，因此這裡僅需 provided 供編譯。
+            實際 JDBC 驅動（sqlite/mysql/mariadb）以類別名稱字串載入，無需編譯相依。
+        -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.1.5</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.name}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <!-- 處理 plugin.yml 內的 ${project.version} 佔位 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>

@@ -1,0 +1,268 @@
+#
+#   ServerAPI  ·  以 REST API 對外提供 Minecraft 伺服器資料
+#
+#   端點    /api/v1/{站點}        別名 /api/{站點} 永遠指向最新版
+#   回應    { ok, data, meta }
+#   文件    http://<host>:<port>/api/docs      （需開啟 web.docs）
+#
+
+# 語言
+# ──────────────────────────────────────────────────────────────
+# auto = 依主機語系判斷，首次啟動後寫入實際結果。內建 en_US、zh_TW。
+# 用 /serverapi lang <代碼> 切換：設定檔會先備份，再以新語言範本重建，設定值全數保留。
+language: "auto"
+
+
+# HTTP 伺服器
+# ──────────────────────────────────────────────────────────────
+http:
+  bind-address: "0.0.0.0"     # 0.0.0.0 對外開放 · 127.0.0.1 僅限本機
+  port: 8080                  # 避免與遊戲埠 25565 衝突
+  base-path: "/api"
+  threads: 8                  # 站點皆讀快取，公開服 8~16 已足夠
+
+# 每次請求寫入主控台，並推送給有 serverapi.notice 權限的玩家
+debug: false
+
+
+# 站點開關
+# ──────────────────────────────────────────────────────────────
+# 關閉的站點不註冊，直接回 404。
+stations:
+  # 伺服器
+  server: true          # /server         版本、MOTD、最大玩家數、遊戲模式
+  performance: true     # /performance    TPS、記憶體、JVM
+  constants: true       # /constants      靜態列舉（遊戲模式、難度、環境）
+
+  # 世界
+  worlds: true          # /worlds         世界列表與細節 /worlds/{name}
+  gamerules: true       # /gamerules      各世界的 game rule
+  entities: true        # /entities       各世界實體統計，不含玩家
+  spawnlimits: true     # /spawnlimits    各世界生怪上限與間隔
+
+  # 玩家
+  status: true          # /status         線上 UUID 與人數 ?history=true
+  player: true          # /player/{uuid}  單一玩家 ?detailed=true
+  punishments: true     # /punishments    處罰紀錄 ?view=html
+  bans: true            # /bans           封鎖名單，玩家 UUID 與 IP
+  operators: true       # /operators      管理員 (OP) 名單
+  whitelist: true       # /whitelist      白名單狀態與名單
+
+  # 其他
+  plugins: true         # /plugins        已安裝插件列表
+  placeholders: true    # /placeholders   PlaceholderAPI 解析 ?list=true
+  network: true         # /network        跨伺服器彙整，需多服 + Redis
+
+
+# 網頁介面
+# ──────────────────────────────────────────────────────────────
+# 以 HTML 呈現的三個頁面，適合嵌進官網，但也等於把內容完整攤開給所有人。
+# 關閉後對應路徑／參數一律回 404，JSON 端點本身不受影響。
+web:
+  docs: false           # /api/docs                 互動式 API 文件與試用介面
+  punishments: false    # /punishments?view=html    處罰紀錄展示頁
+  placeholders: false   # /placeholders?list=true   PlaceholderAPI 預覽頁
+
+
+# 金鑰驗證
+# ──────────────────────────────────────────────────────────────
+# 以標頭 X-API-Key 帶入。enabled 為 false 時整套驗證關閉，所有端點與欄位皆公開。
+auth:
+  enabled: false
+  api-key: "change-me"
+  allow-query-key: true       # 也接受 ?key=xxx，方便瀏覽器測試
+  hide-protected: true        # 未授權時回 404 而非 401，不透露端點存在
+
+  # 需要金鑰才能存取的端點。未列出者預設 true，新站點不會意外公開。
+  require-key:
+    index: false
+
+    server: true
+    performance: true
+    constants: true
+
+    worlds: true
+    gamerules: true
+    entities: true
+    spawnlimits: true
+
+    status: false
+    player: false
+    punishments: true
+    bans: true
+    operators: true
+    whitelist: true
+
+    plugins: true
+    placeholders: true
+    network: true
+
+    docs: false
+
+  # 端點公開時仍要藏起來的欄位，任意層級同名皆移除。
+  # 未驗證時 meta.hiddenFields 會列出被隱藏的欄位。
+  protected-fields:
+    server: ["motd", "ip", "port"]
+    worlds: ["seed"]
+    status: []
+    # op 與 banned 在 /operators、/bans 都要金鑰，這裡不擋等於留後門：
+    # 用公開的 /status 取得線上 UUID 再逐一查 /player 即可還原名單。
+    player: ["op", "banned", "discord"]
+
+
+# 速率限制
+# ──────────────────────────────────────────────────────────────
+# token bucket：固定速率補充額度，容許短暫叢發，持續超量回 429 並附 Retry-After。
+rate-limit:
+  enabled: true
+  per-ip-per-minute: 120      # 每個來源 IP 的每分鐘上限
+  burst: 30                   # 允許的瞬間叢發（一頁載入多個端點時需要）
+  global-per-minute: 0        # 所有來源合計上限，0 = 不限
+  exempt-authenticated: true  # 帶有效金鑰者不受限（需 auth.enabled）
+  exempt-ips:
+    - "127.0.0.1"
+
+
+# 真實來源 IP
+# ──────────────────────────────────────────────────────────────
+# 反向代理後方時所有訪客的來源都是代理主機，速率限制與 IP 豁免會因此失準。
+# 標頭可任意偽造，故僅採信來自 trusted-proxies 的連線。
+real-ip:
+  enabled: false
+
+  # 支援單一位址與 CIDR。"cloudflare" 會展開為官方公布的所有區段。
+  # 只列出實際在用的，多列等於擴大可偽造範圍。
+  trusted-proxies:
+    - "127.0.0.1/32"          # 本機 Nginx / Apache
+    - "::1/128"
+    # - "10.0.0.0/8"          # 內網代理
+    # - "cloudflare"          # 使用 Cloudflare 時取消註解
+
+  # 依序嘗試，取第一個有效值。X-Forwarded-For 為轉發鏈，
+  # 會由右往左略過可信代理後取真實來源。
+  headers:
+    - "CF-Connecting-IP"      # Cloudflare
+    - "True-Client-IP"        # Cloudflare Enterprise / Akamai
+    - "X-Real-IP"             # Nginx 慣例
+    - "X-Forwarded-For"       # 通用標準
+
+
+# 快照間隔
+# ──────────────────────────────────────────────────────────────
+# 需要主執行緒才安全的資料由主執行緒定期快照，HTTP 請求只讀快取，
+# 因此請求量再大也不影響 TPS。單位為 tick（20 tick = 1 秒）。
+# 回應的 meta.cachedAt 即該份資料的實際擷取時間。
+cache:
+  status-ticks: 100           # 5 秒   線上人數，最即時也最便宜
+  entities-ticks: 400         # 20 秒  需遍歷所有實體，最耗費
+  worlds-ticks: 12000         # 10 分鐘
+  gamerules-ticks: 12000      # 10 分鐘
+  spawnlimits-ticks: 12000    # 10 分鐘
+
+
+# 資料庫
+# ──────────────────────────────────────────────────────────────
+# 歷史資料、統計快取與處罰日誌的唯一真相來源。
+storage:
+  type: sqlite                # sqlite · mysql · mariadb
+  table-prefix: "serverapi_"
+
+  sqlite:
+    file: "history.db"        # 位於 plugins/ServerAPI/
+
+  sql:                        # mysql / mariadb 共用
+    host: "localhost"
+    port: 3306
+    database: "serverapi"
+    username: "root"
+    password: ""
+    pool-size: 5
+
+
+# Redis（選用）
+# ──────────────────────────────────────────────────────────────
+# 查詢優先讀 Redis，更新時先寫資料庫再覆蓋 Redis。
+# Redis 掛掉自動降級為資料庫，服務不中斷，恢復後自動回填。
+# 跨服彙整 /network 需要 Redis。單機且 Redis 在遠端時，本地資料庫通常更快。
+redis:
+  enabled: false
+  host: "localhost"
+  port: 6379
+  password: ""
+  database: 0
+  namespace: "serverapi"      # 鍵名前綴
+
+
+# 歷史資料
+# ──────────────────────────────────────────────────────────────
+# 供 /status?history=true 使用。
+history:
+  enabled: true
+  update-interval-minutes: 10
+  retention-hours: 24
+
+
+# 離線玩家統計快取
+# ──────────────────────────────────────────────────────────────
+# 供 /player/{uuid}?detailed=true 使用。離線玩家需重讀統計檔（約 425ms），
+# 線上玩家僅約 4ms，故只快取離線玩家。資料存於 Redis／資料庫，不佔伺服器記憶體。
+player-stat-cache:
+  enabled: true
+  ttl-seconds: 60
+
+
+# 處罰日誌
+# ──────────────────────────────────────────────────────────────
+# Minecraft 與 CMI 都不保存踢出歷史，由本插件監聽事件補上這塊。
+# 事件僅寫入記憶體佇列，資料庫寫入全部非同步，不影響 TPS。
+# 只能記錄啟用之後發生的事件，過去的踢出無法追溯。
+punishment-log:
+  enabled: true
+  flush-seconds: 5
+  reconcile-seconds: 30       # 與封鎖名單／CMI 對帳的間隔
+  skip-kick-when-banned: true # 封鎖已記在名單中，略過連帶的那筆踢出
+
+  # 保留天數，逾期自動清除。0 或負數 = 永久保存（稽核用途建議如此）。
+  # 每筆約數百 bytes，且 /punishments 一次最多回 500 筆，回應大小不隨之成長。
+  retention-days: 90
+
+  # 要記錄哪些踢出原因（PlayerKickEvent.Cause）。
+  # 預設只記真正的處罰，TIMEOUT、IDLING 等連線問題不算。
+  # 其他可用值：BANNED、IP_BANNED、WHITELIST、SPAM、FLYING_PLAYER、ILLEGAL_ACTION
+  kick-causes:
+    - KICK_COMMAND            # /kick 指令
+    - PLUGIN                  # 插件發出的踢出（含 CMI）
+
+
+# 第三方插件整合
+# ──────────────────────────────────────────────────────────────
+# 皆為選用。未安裝時對應欄位為 null，不影響其他功能。
+#   LuckPerms       /player 的 rank
+#   CMI             /player 的 nickname、顏色、遊玩時長、AFK
+#                   /punishments 的警告、禁言、監禁
+#   Vault           /player 的 balance
+#   DiscordSRV      /player 的 discord、/status 的 discord 成員數
+#   PlaceholderAPI  /placeholders 站點
+integrations:
+  luckperms:
+    # 離線玩家 rank 查詢逾時。此查詢在 HTTP 執行緒，設短一點可避免佔滿執行緒池。
+    timeout-ms: 1000
+
+  placeholderapi:
+    resolve-timeout-ms: 2000  # 解析須在主執行緒，逾時回 504
+    strip-color: true         # 移除回傳值中的 § 色碼
+
+
+# 多服
+# ──────────────────────────────────────────────────────────────
+# 多台伺服器共用同一個 Redis／資料庫，以 server-id 隔離；
+# 同一 cluster-id 的伺服器會互相發現，可由 /network 取得全網彙整。
+#
+#   鍵名   {namespace}:{cluster-id}:{server-id}:{type}[:{id}]
+#   單機   serverapi:::history
+#   多服   serverapi:main:survival:history
+network:
+  enabled: false              # 關閉時不發布心跳，/network 停用
+  server-id: "global"         # global = 視為單機。多台共用時務必各設唯一值
+  cluster-id: ""              # 同群組設相同值，留空即可
+  heartbeat-seconds: 10       # 逾 3 倍未更新即視為離線
