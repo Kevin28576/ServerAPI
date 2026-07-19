@@ -9,6 +9,7 @@ A REST API allowing websites, Discord bots and dashboards to read live data from
 [![Paper](https://img.shields.io/badge/Paper-26.1-blue)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange)](https://adoptium.net)
 [![Version](https://img.shields.io/badge/version-1.0.0-green)](https://github.com/Kevin28576/ServerAPI/releases)
+[![Modrinth](https://img.shields.io/badge/Modrinth-Download-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/paper-serverapi)
 
 ```bash
 curl http://localhost:8080/api/v1/status
@@ -63,10 +64,10 @@ database drivers (HikariCP / JDBC / Jedis) from Maven, so **the first launch nee
 | `/punishments`, `/punishments/{uuid}` | Punishment records and statistics | ✓ |
 | `/bans` | Ban list, player UUIDs and IPs | ✓ |
 | `/operators` | Operator list | ✓ |
-| `/whitelist` | Whitelist state and entries | ✓ |
+| `/whitelist` | Whitelist state and entries (off by default) | ✓ |
 | `/plugins` | Installed plugin list | ✓ |
 | `/placeholders?uuid=&p=` | Resolve PlaceholderAPI placeholders | ✓ |
-| `/network` | Cross-server aggregation (needs multi-server + Redis) | ✓ |
+| `/network` | Cross-server aggregation (off by default, needs multi-server + Redis) | ✓ |
 | `/constants` | Static enum reference (game mode, difficulty, environment) | ✓ |
 
 Every endpoint is served at two paths. `/api/v1/{endpoint}` is the versioned path — **use this for

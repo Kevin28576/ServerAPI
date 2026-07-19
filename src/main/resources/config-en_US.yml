@@ -47,12 +47,12 @@ stations:
   punishments: true     # /punishments    Punishment records ?view=html
   bans: true            # /bans           Ban list, player UUIDs and IPs
   operators: true       # /operators      Operator list
-  whitelist: true       # /whitelist      Whitelist state and entries
+  whitelist: false      # /whitelist      Whitelist state and entries
 
   # Other
   plugins: true         # /plugins        Installed plugin list
   placeholders: true    # /placeholders   PlaceholderAPI resolution ?list=true
-  network: true         # /network        Cross-server aggregation, needs multi-server + Redis
+  network: false        # /network        Cross-server aggregation, needs multi-server + Redis
 
 
 # Web pages

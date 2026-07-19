@@ -96,12 +96,17 @@
     .then(function (d) { INDEX = d; })
     .catch(function () { /* 以 file:// 開啟時 fetch 會被擋，搜尋停用，其餘功能不受影響 */ });
 
-  function placeholder() {
-    q.placeholder = root.getAttribute('data-lang') === 'zh' ? '搜尋文件…' : 'Search docs…';
+  /* 沒有可見文字的元件（搜尋框提示、選單鈕的輔助標籤）改由這裡依語言指定 */
+  function labels() {
+    var zh = root.getAttribute('data-lang') === 'zh';
+    q.placeholder = zh ? '搜尋文件…' : 'Search docs…';
+    var menuBtn = document.getElementById('menu');
+    menuBtn.setAttribute('aria-label', zh ? '選單' : 'Menu');
+    menuBtn.setAttribute('title', zh ? '選單' : 'Menu');
   }
-  var langObserver = new MutationObserver(placeholder);
+  var langObserver = new MutationObserver(labels);
   langObserver.observe(root, { attributes: true, attributeFilter: ['data-lang'] });
-  placeholder();
+  labels();
 
   function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 

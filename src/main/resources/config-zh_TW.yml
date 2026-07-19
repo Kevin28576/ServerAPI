@@ -46,12 +46,12 @@ stations:
   punishments: true     # /punishments    處罰紀錄 ?view=html
   bans: true            # /bans           封鎖名單，玩家 UUID 與 IP
   operators: true       # /operators      管理員 (OP) 名單
-  whitelist: true       # /whitelist      白名單狀態與名單
+  whitelist: false      # /whitelist      白名單狀態與名單
 
   # 其他
   plugins: true         # /plugins        已安裝插件列表
   placeholders: true    # /placeholders   PlaceholderAPI 解析 ?list=true
-  network: true         # /network        跨伺服器彙整，需多服 + Redis
+  network: false        # /network        跨伺服器彙整，需多服 + Redis
 
 
 # 網頁介面

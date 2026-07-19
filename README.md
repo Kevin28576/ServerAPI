@@ -9,6 +9,7 @@
 [![Paper](https://img.shields.io/badge/Paper-26.1-blue)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange)](https://adoptium.net)
 [![Version](https://img.shields.io/badge/version-1.0.0-green)](https://github.com/Kevin28576/ServerAPI/releases)
+[![Modrinth](https://img.shields.io/badge/Modrinth-%E4%B8%8B%E8%BC%89-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/paper-serverapi)
 
 ```bash
 curl http://localhost:8080/api/v1/status
@@ -63,10 +64,10 @@ curl http://localhost:8080/api/v1/status
 | `/punishments`、`/punishments/{uuid}` | 處罰紀錄與統計 | ✓ |
 | `/bans` | 封鎖名單（玩家 UUID 與 IP） | ✓ |
 | `/operators` | 管理員 (OP) 名單 | ✓ |
-| `/whitelist` | 白名單狀態與名單 | ✓ |
+| `/whitelist` | 白名單狀態與名單（預設關閉） | ✓ |
 | `/plugins` | 已安裝插件列表 | ✓ |
 | `/placeholders?uuid=&p=` | 解析 PlaceholderAPI 變數 | ✓ |
-| `/network` | 跨伺服器彙整（需多服 + Redis） | ✓ |
+| `/network` | 跨伺服器彙整（預設關閉，需多服 + Redis） | ✓ |
 | `/constants` | 靜態列舉參考（遊戲模式、難度、環境） | ✓ |
 
 每個端點同時掛在兩個路徑：`/api/v1/{端點}` 是版本化路徑，**對外串接請用這個**；

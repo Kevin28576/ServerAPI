@@ -77,6 +77,9 @@ public final class ServerAPIPlugin extends JavaPlugin {
 
     /** 教學文檔。主控台與指令都會附上，讓服主不必回頭找連結。 */
     private static final String DOCS_URL = "https://cloudxact.com/wiki/serverapi/";
+    private static final String GITHUB_URL = "https://github.com/Kevin28576/ServerAPI";
+    private static final String MODRINTH_URL = "https://modrinth.com/plugin/paper-serverapi";
+    private static final String DISCORD_URL = "https://discord.gg/JyQPpVrhsk";
 
     /**
      * bStats 專案編號，於 bstats.org 註冊插件後取得。填錯會把資料送到別人的圖表上，
@@ -1136,6 +1139,15 @@ public final class ServerAPIPlugin extends JavaPlugin {
                                 return Command.SINGLE_SUCCESS;
                             })
                             .then(Commands.argument("code", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                    // 補全選項取自實際存在的語言檔（jar 內建 + lang/ 目錄），
+                                    // 不是寫死的清單 —— 服主自己加的語言檔也要能補到。
+                                    .suggests((ctx, builder) -> {
+                                        String typed = builder.getRemaining().toLowerCase();
+                                        for (String code : lang.available()) {
+                                            if (code.toLowerCase().startsWith(typed)) builder.suggest(code);
+                                        }
+                                        return builder.buildFuture();
+                                    })
                                     .executes(ctx -> {
                                         doLangSwitch(ctx.getSource().getSender(),
                                                 com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "code"));
@@ -1150,11 +1162,26 @@ public final class ServerAPIPlugin extends JavaPlugin {
         });
     }
 
+    /** 聊天欄的分隔線。純裝飾不含文字，因此不進語言檔。 */
+    private static final String CHAT_RULE =
+            "&7&m──&f&l&m───────────────────────────────&7&m──";
+
     private void doInfo(CommandSender sender) {
-        send(sender, lang.get("command.status",
-                httpServer != null ? lang.get("command.running") : lang.get("command.stopped")));
-        send(sender, lang.get("command.usage"));
-        sendDocs(sender);
+        String state = httpServer != null
+                ? lang.get("command.running") : lang.get("command.stopped");
+        send(sender, "");
+        send(sender, lang.get("command.header", getPluginMeta().getVersion(), state));
+        send(sender, CHAT_RULE);
+        send(sender, "");
+        // 逐行列出子指令並附說明。原本擠成 <reload|info|lang> 一行，
+        // 看得到有哪些指令，卻看不出各自做什麼。
+        send(sender, lang.get("command.usage-info"));
+        send(sender, lang.get("command.usage-reload"));
+        send(sender, lang.get("command.usage-lang"));
+        send(sender, "");
+        send(sender, CHAT_RULE);
+        sendLinks(sender);
+        send(sender, "");
     }
 
     private void doLangInfo(CommandSender sender) {
@@ -1227,15 +1254,37 @@ public final class ServerAPIPlugin extends JavaPlugin {
     }
 
     /**
-     * 文檔連結。遊戲內可直接點開，主控台則顯示純網址讓人複製。
-     * 兩者共用同一則語言字串，只差在有沒有掛上點擊事件。
+     * 文檔／GitHub／Discord 三個連結，併成一列可點的短標籤。
+     *
+     * 網址放進 hover 而不直接印出：聊天欄寬度有限，三串網址攤開會佔掉整個畫面。
+     * 主控台點不了標籤，所以那邊改為逐行印出完整網址讓人複製。
      */
-    private void sendDocs(CommandSender sender) {
-        Component line = LEGACY.deserialize(lang.get("command.docs", DOCS_URL))
-                .clickEvent(ClickEvent.openUrl(DOCS_URL))
-                .hoverEvent(HoverEvent.showText(
-                        LEGACY.deserialize(lang.get("command.docs-hover"))));
+    private void sendLinks(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            send(sender, lang.get("console.docs", "&f" + DOCS_URL));
+            send(sender, lang.get("console.modrinth", "&f" + MODRINTH_URL));
+            send(sender, lang.get("console.github", "&f" + GITHUB_URL));
+            send(sender, lang.get("console.discord", "&f" + DISCORD_URL));
+            return;
+        }
+        Component line = link("command.link-docs", "command.docs-hover", DOCS_URL)
+                .append(Component.text(" "))
+                .append(link("command.link-modrinth", "command.modrinth-hover", MODRINTH_URL))
+                .append(Component.text(" "))
+                .append(link("command.link-github", "command.github-hover", GITHUB_URL))
+                .append(Component.text(" "))
+                .append(link("command.link-discord", "command.discord-hover", DISCORD_URL));
         sender.sendMessage(line);
+    }
+
+    /** 單一可點標籤：hover 顯示說明與完整網址，點擊開啟。 */
+    private Component link(String labelKey, String hoverKey, String url) {
+        Component hover = LEGACY.deserialize(lang.get(hoverKey))
+                .append(Component.newline())
+                .append(LEGACY.deserialize("&7" + url));
+        return LEGACY.deserialize(lang.get(labelKey))
+                .clickEvent(ClickEvent.openUrl(url))
+                .hoverEvent(HoverEvent.showText(hover));
     }
 
     private void doReload(CommandSender sender) {

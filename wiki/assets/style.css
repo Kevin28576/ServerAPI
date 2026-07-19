@@ -1,6 +1,7 @@
 :root{color-scheme:light dark;--bg:#0f1115;--card:#171a21;--fg:#e6e8ee;--mut:#9aa3b2;
       --bd:#262b36;--acc:#4cc2ff;--warn:#f39c12;--bar:#12151bd9;
-      --top-h:51px}   /* 由 app.js 依實際頂欄高度覆寫；此為未跑 JS 時的合理預設 */
+      --ctl:34px;   /* 頂欄控制項共用高度，避免各自算出不同尺寸 */
+      --top-h:53px}   /* 由 app.js 依實際頂欄高度覆寫；此為未跑 JS 時的合理預設 */
 @media(prefers-color-scheme:light){:root{--bg:#f6f7f9;--card:#fff;--fg:#16181d;--mut:#5b6472;
       --bd:#e2e5ea;--acc:#0969da;--bar:#ffffffd9}}
 *{box-sizing:border-box}
@@ -22,8 +23,9 @@ a{color:var(--acc)}
 .brand .v{font:11.5px ui-monospace,Consolas,monospace;color:var(--mut);font-weight:400;
           align-self:flex-end;padding-bottom:.15rem}
 .search{position:relative;width:230px;margin-left:auto}
-.search input{width:100%;background:var(--card);border:1px solid var(--bd);color:var(--fg);
-              border-radius:8px;padding:.32rem .65rem;font:inherit;font-size:.84rem;outline:none}
+.search input{width:100%;height:var(--ctl);background:var(--card);border:1px solid var(--bd);
+              color:var(--fg);border-radius:8px;padding:0 .7rem;font:inherit;font-size:.84rem;
+              outline:none}
 .search input:focus{border-color:var(--acc)}
 #results{position:absolute;top:calc(100% + .4rem);left:0;right:0;background:var(--card);
          border:1px solid var(--bd);border-radius:9px;overflow:hidden;display:none;
@@ -36,9 +38,22 @@ a{color:var(--acc)}
 #results b{color:var(--acc);display:block;font-size:.82rem;margin-bottom:.1rem}
 #results small{color:var(--mut);font-size:.78rem;line-height:1.5}
 #results .none{padding:.6rem .75rem;color:var(--mut);font-size:.85rem}
+.links{display:flex;align-items:center;gap:.15rem}
+.links a{text-decoration:none;display:flex;align-items:center;justify-content:center;
+         height:var(--ctl);white-space:nowrap}
+.links svg{display:block}
+/* GitHub／Discord 只放品牌圖示，文字標籤交給 title 與 aria-label */
+.links .ico{width:var(--ctl);border-radius:8px;color:var(--mut)}
+.links .ico:hover{color:var(--fg);background:var(--card)}
+/* 下載鈕用 Modrinth 品牌綠；配深色字而非白字，白字在這個綠上對比不足 */
+.links a.dl{gap:.45rem;margin-left:.5rem;padding:0 .95rem;background:#00af5c;color:#0d1117;
+            font-weight:600;font-size:.85rem;border-radius:8px}
+.links a.dl:hover{background:#00c96b}
+.sep{width:1px;height:20px;background:var(--bd);margin:0 .25rem}
 .langs{display:flex;gap:.3rem}
-.langs button{background:transparent;border:1px solid var(--bd);color:var(--mut);border-radius:7px;
-              padding:.25rem .65rem;font:inherit;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.langs button{height:var(--ctl);background:transparent;border:1px solid var(--bd);color:var(--mut);
+              border-radius:8px;padding:0 .7rem;font:inherit;font-size:.81rem;cursor:pointer;
+              white-space:nowrap}
 .langs button:hover{color:var(--fg)}
 .langs button.on{background:var(--card);border-color:var(--acc);color:var(--acc)}
 
@@ -168,12 +183,18 @@ footer .copy{margin-top:.35rem;font-size:.79rem;opacity:.75}
         transform:translateX(-100%);transition:transform .18s ease;padding:1rem .8rem 2rem}
   /* 頂欄在窄螢幕換行：搜尋框獨佔一列，否則會被壓到 55px 無法使用 */
   .top-in{flex-wrap:wrap;padding:.45rem .8rem}
-  .search{order:3;width:100%;margin:.45rem 0 .15rem}
-  .langs{margin-left:auto}
+  .search{order:3;flex:1 1 150px;width:auto;margin:.45rem .35rem .15rem 0}
+  .links{order:4;margin:.45rem 0 .15rem}
+  .langs{order:5}
+  .sep{display:none}
   .brand .v{display:none}
   aside.open{transform:none}
   main{padding:1.6rem 1.1rem 0}
-  .search{margin-left:0}
   .langs button{padding:.25rem .5rem}
   .pager{grid-template-columns:1fr}
+}
+/* 手機：語言鈕併回第一列，第二列留給搜尋框與三個連結 */
+@media(max-width:700px){
+  .search{flex:1 1 110px}
+  .langs{order:2;margin-left:auto}
 }
