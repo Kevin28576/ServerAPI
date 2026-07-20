@@ -76,6 +76,7 @@
       <div class="zh"><p>成功與失敗使用同一層信封，呼叫端先看 <code>ok</code> 分流即可，內容永遠在 <code>data</code>。</p>
 <pre><code>{ "ok": true,  "data": { … }, "meta": { … } }
 { "ok": false, "error": { "status": 404, "message": "…", "path": "…" }, "meta": { … } }</code></pre>
+<img class="shot" src="../assets/gallery/response-zh.png" alt="一次完整的請求與回應，並標出 ok、data、meta 三個欄位" width="1600" height="900" loading="lazy">
 <h3 id="zh-meta-的兩個時間戳">meta 的兩個時間戳</h3>
 <table>
 <tr><th>欄位</th><th>出現於</th><th>意義</th></tr>
@@ -97,6 +98,7 @@
 <code>data</code>.</p>
 <pre><code>{ "ok": true,  "data": { … }, "meta": { … } }
 { "ok": false, "error": { "status": 404, "message": "…", "path": "…" }, "meta": { … } }</code></pre>
+<img class="shot" src="../assets/gallery/response.png" alt="A full request and response, with the ok, data and meta fields called out" width="1600" height="900" loading="lazy">
 <h3 id="en-the-two-timestamps-in-meta">The two timestamps in meta</h3>
 <table>
 <tr><th>Field</th><th>Present on</th><th>Meaning</th></tr>

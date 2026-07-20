@@ -84,8 +84,9 @@ public final class SqlHistoryStore implements HistoryStore {
 
     @Override
     public HistoryData read(long sinceTs) throws Exception {
+        // 由新到舊：呼叫端要的就是這個順序，交給資料庫排比讀出來再反轉省一次走訪
         String sql = "SELECT ts, online, discord FROM " + table
-                + " WHERE ts >= ? AND server = ? ORDER BY ts ASC";
+                + " WHERE ts >= ? AND server = ? ORDER BY ts DESC";
         List<Integer> online = new ArrayList<>();
         List<Integer> discord = new ArrayList<>();
         long last = 0;
@@ -94,7 +95,8 @@ public final class SqlHistoryStore implements HistoryStore {
             ps.setString(2, serverId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    last = rs.getLong("ts");
+                    // 第一列即最新的一筆；不能像升冪那樣逐列覆寫，否則 last 會變成最舊的
+                    if (online.isEmpty()) last = rs.getLong("ts");
                     online.add(rs.getInt("online"));
                     int d = rs.getInt("discord");
                     discord.add(rs.wasNull() ? null : d);

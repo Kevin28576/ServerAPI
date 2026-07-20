@@ -76,6 +76,7 @@
       <div class="zh"><p>歷史資料、玩家統計快取與處罰日誌都寫入資料庫，<b>資料庫是唯一真相來源</b>。</p>
 <pre><code>storage:
   type: sqlite          # sqlite · mysql · mariadb</code></pre>
+<img class="shot" src="../assets/gallery/architecture-zh.png" alt="主執行緒定期快照，HTTP 請求只讀快取；下半為儲存與多服架構" width="1600" height="900" loading="lazy">
 <h3 id="zh-redis-選用">Redis（選用）</h3>
 <p>查詢優先讀 Redis，更新時先寫資料庫再覆蓋 Redis。Redis 掛掉會自動降級為資料庫，
 服務不中斷，恢復後自動回填。</p>
@@ -89,6 +90,7 @@
 <b>single source of truth</b>.</p>
 <pre><code>storage:
   type: sqlite          # sqlite · mysql · mariadb</code></pre>
+<img class="shot" src="../assets/gallery/architecture.png" alt="The main thread snapshots on a timer and requests only read the cache" width="1600" height="900" loading="lazy">
 <h3 id="en-redis-optional">Redis (optional)</h3>
 <p>Reads prefer Redis; writes go to the database first and then overwrite Redis. If Redis dies the
 plugin falls back to the database without interruption and backfills on reconnect.</p>

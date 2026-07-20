@@ -94,6 +94,9 @@ th{color:var(--mut);font-weight:500;font-size:.75rem;text-transform:uppercase;
 
    圖示用絕對定位而非 flex：flex 會把每個子元素（<b>、<code>…）都變成獨立
    flex item，內文會被拆成一欄一欄。容器必須維持一般區塊，文字才能正常斷行。 */
+/* 內文插圖：圖本身已是深色底，配一道細框才不會和頁面糊在一起 */
+.shot{display:block;width:100%;height:auto;margin:1.5rem 0;
+      border:1px solid var(--bd);border-radius:10px}
 .note,.warn{position:relative;padding:.85rem 1rem .85rem 2.9rem;border-radius:9px;
             border:1px solid;border-left-width:4px;margin:1.2rem 0;font-size:.9rem}
 .note::before,.warn::before{position:absolute;left:.95rem;top:.9rem;

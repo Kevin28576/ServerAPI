@@ -52,7 +52,7 @@ database drivers (HikariCP / JDBC / Jedis) from Maven, so **the first launch nee
 | Endpoint | Returns | Key by default |
 |----------|---------|:---:|
 | `/status` | Online player UUIDs and count, DiscordSRV member count | |
-| `/status?history=true` | Adds a time series of online and Discord counts | |
+| `/status?history=true` | Adds a time series of online and Discord counts, newest first | |
 | `/player/{uuid}` | One player: name, rank, nickname, playtime, AFK, balance, Discord | |
 | `/player/{uuid}?detailed=true` | Expands per-block / item / entity statistics | |
 | `/server` | Version, MOTD, max players, game mode, view distance | ✓ |

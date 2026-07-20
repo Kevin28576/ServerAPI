@@ -52,7 +52,7 @@ curl http://localhost:8080/api/v1/status
 | 端點 | 內容 | 預設需金鑰 |
 |------|------|:---:|
 | `/status` | 線上玩家 UUID 與人數、DiscordSRV 成員數 | |
-| `/status?history=true` | 附上線上人數與 Discord 人數的時間序列 | |
+| `/status?history=true` | 附上線上人數與 Discord 人數的時間序列（新到舊） | |
 | `/player/{uuid}` | 單一玩家：名稱、rank、暱稱、遊玩時長、AFK、餘額、Discord | |
 | `/player/{uuid}?detailed=true` | 展開方塊／物品／實體的細項統計 | |
 | `/server` | 版本、MOTD、最大玩家數、遊戲模式、視距 | ✓ |

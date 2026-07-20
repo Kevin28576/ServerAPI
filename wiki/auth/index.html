@@ -77,6 +77,7 @@
 <pre><code>curl -H "X-API-Key: &lt;金鑰&gt;" http://localhost:8080/api/v1/plugins
 curl "http://localhost:8080/api/v1/plugins?key=&lt;金鑰&gt;"</code></pre>
 <div class="note">網址會留在瀏覽器歷史與反向代理的存取記錄裡。正式串接請用標頭，網址參數主要方便測試。</div>
+<img class="shot" src="../assets/gallery/security-zh.png" alt="三層存取控管：端點層、欄位層、回應偽裝" width="1600" height="900" loading="lazy">
 <h3 id="zh-三層控管">三層控管</h3>
 <p><b>端點層</b> —— <code>auth.require-key.&lt;端點&gt;</code> 逐一決定。
 <b>未列出的端點預設需要金鑰</b>，新端點不會意外公開。</p>
@@ -103,6 +104,7 @@ curl "http://localhost:8080/api/v1/plugins?key=&lt;金鑰&gt;"</code></pre>
 curl "http://localhost:8080/api/v1/plugins?key=&lt;key&gt;"</code></pre>
 <div class="note">URLs end up in browser history and reverse-proxy access logs. Use the header for
 real integrations; the query parameter is mainly for testing.</div>
+<img class="shot" src="../assets/gallery/security.png" alt="The three layers of access control" width="1600" height="900" loading="lazy">
 <h3 id="en-three-layers">Three layers</h3>
 <p><b>Per endpoint</b> — <code>auth.require-key.&lt;endpoint&gt;</code>.
 <b>Anything not listed defaults to requiring a key</b>, so a new endpoint is never public by accident.</p>

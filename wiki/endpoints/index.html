@@ -79,7 +79,7 @@
 <table>
 <tr><th>端點</th><th>內容</th><th>預設需金鑰</th></tr>
 <tr><td><code>/status</code></td><td>線上玩家 UUID 與人數、Discord 成員數</td><td></td></tr>
-<tr><td><code>/status?history=true</code></td><td>附上人數的時間序列</td><td></td></tr>
+<tr><td><code>/status?history=true</code></td><td>附上人數的時間序列（新到舊）</td><td></td></tr>
 <tr><td><code>/player/{uuid}</code></td><td>名稱、rank、暱稱、遊玩時長、AFK、餘額、Discord</td><td></td></tr>
 <tr><td><code>/player/{uuid}?detailed=true</code></td><td>展開方塊／物品／實體細項統計</td><td></td></tr>
 <tr><td><code>/server</code></td><td>版本、MOTD、最大玩家數、遊戲模式</td><td>✓</td></tr>
@@ -106,7 +106,7 @@ at the latest version.</p>
 <table>
 <tr><th>Endpoint</th><th>Returns</th><th>Key by default</th></tr>
 <tr><td><code>/status</code></td><td>Online player UUIDs and count, Discord members</td><td></td></tr>
-<tr><td><code>/status?history=true</code></td><td>Adds a time series of the counts</td><td></td></tr>
+<tr><td><code>/status?history=true</code></td><td>Adds a time series of the counts, newest first</td><td></td></tr>
 <tr><td><code>/player/{uuid}</code></td><td>Name, rank, nickname, playtime, AFK, balance, Discord</td><td></td></tr>
 <tr><td><code>/player/{uuid}?detailed=true</code></td><td>Expands per-block / item / entity stats</td><td></td></tr>
 <tr><td><code>/server</code></td><td>Version, MOTD, max players, game mode</td><td>✓</td></tr>
