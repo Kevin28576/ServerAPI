@@ -6,10 +6,11 @@
 
 ![ServerAPI](banner-zh.png)
 
+[![Version](https://img.shields.io/badge/version-1.1.0-green)](https://github.com/Kevin28576/ServerAPI/releases)
 [![Paper](https://img.shields.io/badge/Paper-26.1-blue)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange)](https://adoptium.net)
-[![Version](https://img.shields.io/badge/version-1.1.0-green)](https://github.com/Kevin28576/ServerAPI/releases)
 [![Modrinth](https://img.shields.io/badge/Modrinth-%E4%B8%8B%E8%BC%89-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/paper-serverapi)
+[![](https://jitpack.io/v/Kevin28576/ServerAPI.svg)](https://jitpack.io/#Kevin28576/ServerAPI)
 
 ```bash
 curl http://localhost:8080/api/v1/status
