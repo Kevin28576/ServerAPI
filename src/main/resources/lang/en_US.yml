@@ -75,6 +75,18 @@ console:
     generic-fix-1: "Error: &f{0}"
     generic-fix-2: "Check that &fhttp.bind-address&7 and &fhttp.port&7 are correct"
 
+  custom:
+    registered-new: "Third-party station detected: {0} -> {1}. Config created at {2} (disabled by default, pending your review)"
+    registered: "Third-party station re-registered: {0} -> {1}"
+    serving: "Serving third-party station {0} ({1})"
+    disabled: "Third-party station {0} is disabled; set enabled: true in {1} and reload to turn it on"
+    unregistered: "Third-party station unregistered: {0}"
+    rejected-name: "Registration rejected: invalid station name {0} (from {1}); only lowercase letters, digits, _ and - are allowed, and it must start with a letter or digit"
+    rejected-reserved: "Registration rejected: station name {0} clashes with a built-in station (from {1})"
+    rejected-taken: "Registration rejected: station name {0} is already registered by {1}; {2} cannot reuse it"
+    config-failed: "Failed to write third-party station config {0}: {1}"
+    index-desc: "Third-party station provided by {0}"
+
   warn:
     network-global: "Multi-server is enabled but network.server-id is still 'global'. Set a unique server-id on each server sharing one Redis, otherwise their data will overwrite each other."
     network-no-redis: "Multi-server is enabled but Redis is not configured, /api/network will be unavailable."
@@ -246,3 +258,12 @@ web:
     public: "Public"
     loading: "Loading…"
     failed: "Request failed"
+
+custom:
+  file:
+    header: "A plugin asked to expose its data through ServerAPI, so this file was created for it.\nIt starts off: once you are happy with it, set enabled to true and run /serverapi reload.\nThe plugin / path / mode / registered-at lines are just info and get overwritten; the settings below are the ones you change."
+    mode: "async = read live on each request; cached = refreshed every few seconds. Set by the plugin; editing it here does nothing."
+    enabled: "false = the URL is closed (returns 404); set true to actually serve the data."
+    require-key: "true = an API key is required to read it; false = anyone can read it."
+    protected-fields: "people without a key will not see these fields, e.g. [balance, uuid]. Leave [] to show everything."
+    snapshot-seconds: "how often this station refreshes its data, in seconds; you can change it."

@@ -26,6 +26,52 @@
   requestAnimationFrame(function () { requestAnimationFrame(reveal); });
   setTimeout(reveal, 400);
 
+  /* ── 程式碼上色（無外部相依、離線可用；JS 未跑時退回純文字仍可讀）──
+     不分語言的通用掃描器：註解、字串、數字、關鍵字、YAML/JSON 鍵。
+     刻意處理兩個易錯處：:// 網址不可誤判成註解、鍵後的 : 不可吃掉 :// 與 ::。 */
+  var HL_KW = /^(?:var|new|return|if|else|for|while|do|void|public|private|protected|final|static|abstract|class|interface|enum|import|package|extends|implements|throws|throw|try|catch|finally|this|super|boolean|byte|short|int|long|float|double|char|true|false|null)$/;
+  function hlEsc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function hlSpan(cls, s) { return '<span class="hl-' + cls + '">' + hlEsc(s) + '</span>'; }
+  function hlTokenize(src) {
+    var out = '', i = 0, n = src.length;
+    while (i < n) {
+      var c = src[i], rest = src.slice(i), m;
+      // 註解：# 到行尾，或 // 到行尾（前一字為 : 時是網址，不算註解）
+      if (c === '#' || (c === '/' && src[i + 1] === '/' && src[i - 1] !== ':')) {
+        var e = src.indexOf('\n', i); if (e < 0) e = n;
+        out += hlSpan('c', src.slice(i, e)); i = e; continue;
+      }
+      // 字串（單/雙引號，支援跳脫）
+      if (c === '"' || c === "'") {
+        var q = c, j = i + 1;
+        while (j < n && src[j] !== q) { if (src[j] === '\\') j++; j++; }
+        j = Math.min(j + 1, n);
+        out += hlSpan('s', src.slice(i, j)); i = j; continue;
+      }
+      // 數字
+      m = rest.match(/^\d[\d._]*/);
+      if (m) { out += hlSpan('n', m[0]); i += m[0].length; continue; }
+      // 註記 @Word
+      if (c === '@') { m = rest.match(/^@\w+/); if (m) { out += hlSpan('k', m[0]); i += m[0].length; continue; } }
+      // 識別字：關鍵字、或後接單一 : 的 YAML/JSON 鍵，其餘原樣
+      m = rest.match(/^[A-Za-z_$][\w$-]*/);
+      if (m) {
+        var w = m[0], after = src.slice(i + w.length);
+        if (HL_KW.test(w)) out += hlSpan('k', w);
+        else if (/^\s*:(?![:/=])/.test(after)) out += hlSpan('key', w);
+        else out += hlEsc(w);
+        i += w.length; continue;
+      }
+      out += hlEsc(c); i++;
+    }
+    return out;
+  }
+  document.querySelectorAll('main pre > code').forEach(function (code) {
+    code.innerHTML = hlTokenize(code.textContent);
+  });
+
   /* 站內導覽時顯示頂部進度條 */
   var bar = document.getElementById('progress');
   function startBar() {

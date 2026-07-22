@@ -1,9 +1,12 @@
 :root{color-scheme:light dark;--bg:#0f1115;--card:#171a21;--fg:#e6e8ee;--mut:#9aa3b2;
       --bd:#262b36;--acc:#4cc2ff;--warn:#f39c12;--bar:#12151bd9;
       --ctl:34px;   /* 頂欄控制項共用高度，避免各自算出不同尺寸 */
+      /* 程式碼上色（深色主題）；淺色主題於下方 media query 覆寫，兩種底色下都要讀得清楚 */
+      --hl-c:#6b7688;--hl-s:#8fd694;--hl-n:#e2b04a;--hl-k:#c792ea;--hl-key:#4cc2ff;
       --top-h:53px}   /* 由 app.js 依實際頂欄高度覆寫；此為未跑 JS 時的合理預設 */
 @media(prefers-color-scheme:light){:root{--bg:#f6f7f9;--card:#fff;--fg:#16181d;--mut:#5b6472;
-      --bd:#e2e5ea;--acc:#0969da;--bar:#ffffffd9}}
+      --bd:#e2e5ea;--acc:#0969da;--bar:#ffffffd9;
+      --hl-c:#7a8290;--hl-s:#0f7b33;--hl-n:#8a5a00;--hl-k:#8036d1;--hl-key:#0969da}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);
      font:15px/1.75 ui-sans-serif,system-ui,"Segoe UI","Noto Sans TC",sans-serif}
@@ -86,6 +89,12 @@ code{font:.88em ui-monospace,Consolas,monospace}
 p code,li code,td code,th code{background:rgba(127,127,127,.15);padding:.1rem .35rem;
                                border-radius:4px;color:var(--acc)}
 pre code{background:none;padding:0;color:inherit}
+/* app.js 產生的語法上色標記；未跑 JS 時整段仍是純文字，照樣可讀 */
+.hl-c{color:var(--hl-c);font-style:italic}
+.hl-s{color:var(--hl-s)}
+.hl-n{color:var(--hl-n)}
+.hl-k{color:var(--hl-k)}
+.hl-key{color:var(--hl-key)}
 table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0;display:block;overflow-x:auto}
 th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--bd);vertical-align:top}
 th{color:var(--mut);font-weight:500;font-size:.75rem;text-transform:uppercase;

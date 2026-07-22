@@ -75,6 +75,18 @@ console:
     generic-fix-1: "錯誤訊息：&f{0}"
     generic-fix-2: "請確認 &fhttp.bind-address&7 與 &fhttp.port&7 設定是否正確"
 
+  custom:
+    registered-new: "偵測到第三方站點 {0} → {1}。已建立設定檔 {2}（預設停用，待你確認）"
+    registered: "第三方站點重新註冊：{0} → {1}"
+    serving: "對外提供第三方站點 {0}（{1}）"
+    disabled: "第三方站點 {0} 目前停用；於 {1} 改 enabled: true 後重載即可開啟"
+    unregistered: "第三方站點已取消註冊：{0}"
+    rejected-name: "拒絕註冊：站點名稱不合法 {0}（來自 {1}），僅接受小寫英數與 _ -，開頭須為英數"
+    rejected-reserved: "拒絕註冊：站點名稱 {0} 與內建站點衝突（來自 {1}）"
+    rejected-taken: "拒絕註冊：站點名稱 {0} 已被 {1} 註冊，{2} 無法重複使用"
+    config-failed: "第三方站點設定檔寫入失敗 {0}：{1}"
+    index-desc: "由 {0} 提供的第三方站點"
+
   warn:
     network-global: "多服功能已啟用，但 network.server-id 仍為 global。多台伺服器共用同一 Redis 時請設定各自唯一的 server-id，否則資料會互相覆蓋。"
     network-no-redis: "多服功能已啟用，但未設定 Redis，/api/network 將無法使用。"
@@ -169,7 +181,7 @@ station:
 web:
   punishments:
     title: "處罰紀錄"
-    subtitle: "ServerAPI demo —— 資料來自 {0}"
+    subtitle: "ServerAPI demo，資料來自 {0}"
     total: "總處罰"
     punished-players: "受罰玩家"
     active-now: "生效中"
@@ -207,7 +219,7 @@ web:
 
   placeholders:
     title: "PlaceholderAPI 預覽"
-    subtitle: "ServerAPI —— 本伺服器所有已註冊的 expansion 與 placeholder"
+    subtitle: "本伺服器所有已註冊的 expansion 與 placeholder"
     expansions: "已註冊 expansion"
     placeholders: "已宣告 placeholder"
     none-declared: "此 expansion 未宣告範例 placeholder（仍可使用 %{0}_...% 呼叫）。"
@@ -216,12 +228,12 @@ web:
 
   docs:
     title: "ServerAPI 使用文件"
-    subtitle: "Minecraft 伺服器資料的 REST API —— v{0}"
+    subtitle: "Minecraft 伺服器資料的 REST API v{0}"
     base-url: "基準網址"
     api-key: "API 金鑰"
     api-key-placeholder: "貼上金鑰以測試受保護的端點"
     api-key-hint: "只存在你的瀏覽器裡。按下「送出」時會以 X-API-Key 標頭帶入。"
-    auth-disabled: "auth.enabled 為 false —— 目前所有端點都是公開的。下方標記顯示的是「啟用驗證後」才會受保護的端點。"
+    auth-disabled: "auth.enabled 為 false，目前所有端點都是公開的。下方標記顯示的是「啟用驗證後」才會受保護的端點。"
     key-required-hint: "這個端點需要金鑰，請先在頂端工具列填入再送出。"
     quick-start: "快速開始"
     quick-start-hint: "所有端點都是 GET，回應一律為 JSON，直接呼叫即可。"
@@ -246,3 +258,12 @@ web:
     public: "公開"
     loading: "載入中…"
     failed: "請求失敗"
+
+custom:
+  file:
+    header: "有個插件想透過 ServerAPI 對外提供資料，所以自動建立了這個檔案。\n預設是關的：看過內容覺得沒問題，就把 enabled 改成 true、再執行 /serverapi reload。\n最上面 plugin / path / mode / registered-at 只是資訊，改了會被蓋掉；真正能調的是下面幾行。"
+    mode: "async＝每次請求即時讀取；cached＝每隔幾秒更新一次。這行由插件決定，你改了沒用。"
+    enabled: "false＝這個網址打不開（回 404）；改成 true 才會真的對外提供資料。"
+    require-key: "true＝要帶 API 金鑰才讀得到；false＝任何人都能讀。"
+    protected-fields: "沒帶金鑰的人看不到這裡列的欄位，例如填 [balance, uuid]。留空 [] 就是全部公開。"
+    snapshot-seconds: "這個站點多久更新一次資料（秒），你可以自己改。"

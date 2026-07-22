@@ -1,0 +1,11 @@
+# JitPack 建置設定。
+#
+# paper-api 26.1 的 class 檔是 Java 25，JitPack 內建的 JDK 不夠新，
+# 這裡用 SDKMAN 先裝 JDK 25 再讓它建。
+#
+# 若哪天下面這個版本在 SDKMAN 被下架，在本機跑 `sdk list java` 找一個 25.x 換上即可。
+before_install:
+  # 非互動環境自動回答，避免卡在 SDKMAN 的「要設為預設嗎？」提問
+  - echo "sdkman_auto_answer=true" >> "$HOME/.sdkman/etc/config" || true
+  - sdk install java 25.0.3-tem
+  - sdk use java 25.0.3-tem

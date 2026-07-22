@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import kevin.serverapi.customapi.CustomAPIManager;
 import kevin.serverapi.http.handlers.BansHandler;
 import kevin.serverapi.http.handlers.ConstantsHandler;
 import kevin.serverapi.http.handlers.DocsHandler;
@@ -22,6 +21,8 @@ import kevin.serverapi.http.handlers.SpawnLimitsHandler;
 import kevin.serverapi.http.handlers.StatusHandler;
 import kevin.serverapi.http.handlers.WhitelistHandler;
 import kevin.serverapi.http.handlers.WorldsHandler;
+import kevin.serverapi.api.ServerApiRegistry;
+import kevin.serverapi.customapi.CustomAPIManager;
 import kevin.serverapi.discord.DiscordBridge;
 import kevin.serverapi.history.HistoryService;
 import kevin.serverapi.http.ApiHandler;
@@ -99,7 +100,6 @@ public final class ServerAPIPlugin extends JavaPlugin {
     /** 每個快照站點各自的定期任務（各有獨立間隔），外加 onlineCount 更新任務。 */
     private final List<BukkitTask> refreshTasks = new ArrayList<>();
     private BukkitTask historyTask;
-    private CustomAPIManager customAPIManager;
     private final AtomicBoolean reloading = new AtomicBoolean(false);
 
     private volatile HistoryService historyService;   // 可為 null（未啟用）；跨執行緒讀取
@@ -109,6 +109,8 @@ public final class ServerAPIPlugin extends JavaPlugin {
     private String basePath = "/api";
     /** 需要金鑰的站點路徑，供索引隱藏之用。 */
     private final Set<String> protectedPaths = new java.util.HashSet<>();
+    /** 第三方站點協調層：接收註冊、產生設定檔、依伺服器管理員設定掛載。 */
+    private CustomAPIManager customManager;
     private long enabledAt;
     private int stationCount;
     /** 已啟用的站點名稱，供 bStats 統計哪些端點實際被使用。 */
@@ -158,10 +160,15 @@ public final class ServerAPIPlugin extends JavaPlugin {
         saveDefaultConfig();
         setupLanguage();
         registerCommands();
+        // 在 startHttp 之前建立：startHttp 末段會呼叫它把第三方站點掛上
+        customManager = new CustomAPIManager(this);
         startHttp();
+        // 對外公開註冊介面；第三方在自己的 onEnable（晚於此）取用
+        getServer().getServicesManager().register(
+                ServerApiRegistry.class, customManager, this,
+                org.bukkit.plugin.ServicePriority.Normal);
         setupMetrics();
         INSTANCE = this;
-        customAPIManager = new CustomAPIManager();
     }
 
     /**
@@ -358,6 +365,10 @@ public final class ServerAPIPlugin extends JavaPlugin {
         }
         httpServer.createContext(basePath + "/" + ApiHandler.API_VERSION, index);
         httpServer.createContext(basePath, index);
+
+        // 第三方站點：重載時依記憶體中的註冊清單與最新設定檔重新掛上（首次開機時清單為空）。
+        // 傳入本次的 server / registry / protectedPaths 參照，之後的即時註冊沿用它們。
+        customManager.mountAll(httpServer, basePath, enabledStations, protectedPaths);
 
         warnOnAuthConfig(enabledStations);
 
@@ -1316,9 +1327,5 @@ public final class ServerAPIPlugin extends JavaPlugin {
 
     public static ServerAPIPlugin getInstance() {
         return INSTANCE;
-    }
-
-    public CustomAPIManager getCustomAPIManager() {
-        return this.customAPIManager;
     }
 }

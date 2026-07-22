@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-Hant" data-lang="zh" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Developer API · ServerAPI</title>
+<meta name="description" content="This page is for plugin developers integrating with ServerAPI: how to add it to your project, and the API you get. For the full walkthrough, choosing ">
+<link rel="icon" type="image/png" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ServerAPI">
+<meta property="og:title" content="Developer API · ServerAPI">
+<meta property="og:description" content="This page is for plugin developers integrating with ServerAPI: how to add it to your project, and the API you get. For the full walkthrough, choosing ">
+<meta property="og:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Developer API · ServerAPI">
+<meta name="twitter:description" content="This page is for plugin developers integrating with ServerAPI: how to add it to your project, and the API you get. For the full walkthrough, choosing ">
+<meta name="twitter:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
+<meta name="theme-color" content="#4cc2ff">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="top"><div class="top-in">
+  <button class="menu" id="menu" aria-label="Menu">☰</button>
+  <a class="brand" href="../"><img src="../assets/icon.png" alt="" width="22" height="22">
+    ServerAPI<span class="v">v1.1.0</span></a>
+  <div class="search">
+    <input id="q" type="search" autocomplete="off">
+    <div id="results"></div>
+  </div>
+  <nav class="links">
+    <a class="ico" href="https://github.com/Kevin28576/ServerAPI" title="GitHub" aria-label="GitHub"
+       target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+    <a class="ico" href="https://discord.gg/JyQPpVrhsk" title="Discord" aria-label="Discord"
+       target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></a>
+    <a class="dl" href="https://modrinth.com/plugin/paper-serverapi" title="Modrinth" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12.252.004a11.78 11.768 0 0 0-8.92 3.73 11 10.999 0 0 0-2.17 3.11 11.37 11.359 0 0 0-1.16 5.169c0 1.42.17 2.5.6 3.77.24.759.77 1.899 1.17 2.529a12.3 12.298 0 0 0 8.85 5.639c.44.05 2.54.07 2.76.02.2-.04.22.1-.26-1.7l-.36-1.37-1.01-.06a8.5 8.489 0 0 1-5.18-1.8 5.34 5.34 0 0 1-1.3-1.26c0-.05.34-.28.74-.5a37.572 37.545 0 0 1 2.88-1.629c.03 0 .5.45 1.06.98l1 .97 2.07-.43 2.06-.43 1.47-1.47c.8-.8 1.48-1.5 1.48-1.52 0-.09-.42-1.63-.46-1.7-.04-.06-.2-.03-1.02.18-.53.13-1.2.3-1.45.4l-.48.15-.53.53-.53.53-.93.1-.93.07-.52-.5a2.7 2.7 0 0 1-.96-1.7l-.13-.6.43-.57c.68-.9.68-.9 1.46-1.1.4-.1.65-.2.83-.33.13-.099.65-.579 1.14-1.069l.9-.9-.7-.7-.7-.7-1.95.54c-1.07.3-1.96.53-1.97.53-.03 0-2.23 2.48-2.63 2.97l-.29.35.28 1.03c.16.56.3 1.16.31 1.34l.03.3-.34.23c-.37.23-2.22 1.3-2.84 1.63-.36.2-.37.2-.44.1-.08-.1-.23-.6-.32-1.03-.18-.86-.17-2.75.02-3.73a8.84 8.839 0 0 1 7.9-6.93c.43-.03.77-.08.78-.1.06-.17.5-2.999.47-3.039-.01-.02-.1-.02-.2-.03Zm3.68.67c-.2 0-.3.1-.37.38-.06.23-.46 2.42-.46 2.52 0 .04.1.11.22.16a8.51 8.499 0 0 1 2.99 2 8.38 8.379 0 0 1 2.16 3.449 6.9 6.9 0 0 1 .4 2.8c0 1.07 0 1.27-.1 1.73a9.37 9.369 0 0 1-1.76 3.769c-.32.4-.98 1.06-1.37 1.38-.38.32-1.54 1.1-1.7 1.14-.1.03-.1.06-.07.26.03.18.64 2.56.7 2.78l.06.06a12.07 12.058 0 0 0 7.27-9.4c.13-.77.13-2.58 0-3.4a11.96 11.948 0 0 0-5.73-8.578c-.7-.42-2.05-1.06-2.25-1.06Z"/></svg><span
+       class="zh">下載</span><span class="en">Download</span></a>
+  </nav>
+  <span class="sep" aria-hidden="true"></span>
+  <div class="langs">
+    <button data-set="zh">中文</button>
+    <button data-set="en">English</button>
+  </div>
+</div></header>
+
+<div class="layout">
+  <aside id="side">
+<div class="grp"><span class="zh">開始</span><span class="en">Getting started</span></div>
+<a href="../"><span class="zh">總覽</span><span class="en">Overview</span></a>
+<a href="../install/"><span class="zh">安裝</span><span class="en">Installation</span></a>
+<div class="grp"><span class="zh">API</span><span class="en">API</span></div>
+<a href="../endpoints/"><span class="zh">端點</span><span class="en">Endpoints</span></a>
+<a href="../response/"><span class="zh">回應格式</span><span class="en">Response format</span></a>
+<div class="grp"><span class="zh">安全</span><span class="en">Security</span></div>
+<a href="../auth/"><span class="zh">驗證與權限</span><span class="en">Authentication</span></a>
+<a href="../ratelimit/"><span class="zh">速率限制與反向代理</span><span class="en">Rate limiting and proxies</span></a>
+<div class="grp"><span class="zh">功能</span><span class="en">Features</span></div>
+<a href="../punishments/"><span class="zh">處罰紀錄</span><span class="en">Punishment records</span></a>
+<a href="../web/"><span class="zh">網頁介面</span><span class="en">Web pages</span></a>
+<a href="../storage/"><span class="zh">資料儲存</span><span class="en">Storage</span></a>
+<a href="../network/"><span class="zh">多服</span><span class="en">Multi-server</span></a>
+<a href="../custom-stations/"><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></a>
+<a href="../developer-api/" class="on"><span class="zh">開發者 API</span><span class="en">Developer API</span></a>
+<a href="../i18n/"><span class="zh">多語言</span><span class="en">Languages</span></a>
+<div class="grp"><span class="zh">參考</span><span class="en">Reference</span></div>
+<a href="../commands/"><span class="zh">指令與權限</span><span class="en">Commands and permissions</span></a>
+<a href="../integrations/"><span class="zh">第三方整合</span><span class="en">Integrations</span></a>
+<a href="../troubleshooting/"><span class="zh">疑難排解</span><span class="en">Troubleshooting</span></a>
+  </aside>
+  <main>
+    <article>
+
+      <h1><span class="zh">開發者 API</span><span class="en">Developer API</span></h1>
+      <div class="zh"><p>這頁給想串接 ServerAPI 的插件開發者，講怎麼把它加進你的專案、以及可用的 API。
+完整的教學、模式怎麼選、回傳型別，見<a href="../custom-stations/">第三方站點串接</a>。</p>
+
+<h3 id="zh-導入依賴">導入依賴</h3>
+<p>你需要在編譯時看得到 <code>kevin.serverapi.api</code> 底下的 <code>ServerApiRegistry</code>
+與 <code>CustomStation</code>。兩種做法擇一，<b>都不要把 ServerAPI 打包（shade）進你的 jar</b>，
+它執行期由伺服器上的插件提供。</p>
+<p><b>做法一：JitPack。</b>加 repository 和 <code>com.github</code> 座標，第一次編譯時 JitPack 會自動幫你建好：</p>
+<pre><code>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;jitpack.io&lt;/id&gt;
+        &lt;url&gt;https://jitpack.io&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;com.github.Kevin28576&lt;/groupId&gt;
+    &lt;artifactId&gt;ServerAPI&lt;/artifactId&gt;
+    &lt;version&gt;v1.1.0&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;exclusions&gt;
+        &lt;exclusion&gt;&lt;groupId&gt;*&lt;/groupId&gt;&lt;artifactId&gt;*&lt;/artifactId&gt;&lt;/exclusion&gt;
+    &lt;/exclusions&gt;
+&lt;/dependency&gt;</code></pre>
+<p><code>version</code> 填 GitHub 上的 tag 名（例如 <code>v1.1.0</code>）。<code>exclusions</code>
+把 ServerAPI 自己的相依全排掉，因為你只要那兩個介面。</p>
+<p><b>做法二：直接複製。</b>把 <code>ServerApiRegistry.java</code> 與 <code>CustomStation.java</code>
+複製進你的專案。它們只依賴 Bukkit 的 <code>Plugin</code>，複製過去就能編。</p>
+
+<h3 id="zh-serverapiregistry">ServerApiRegistry</h3>
+<p>ServerAPI 啟用時會把它登記到 Bukkit 的 <code>ServicesManager</code>，你在自己的
+<code>onEnable()</code>（會晚於 ServerAPI）取得：</p>
+<pre><code>var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+if (rsp == null) return;                 // 沒裝 ServerAPI，就當作沒這回事
+ServerApiRegistry api = rsp.getProvider();</code></pre>
+<table>
+<tr><th>方法</th><th>作用</th></tr>
+<tr><td><code>register(CustomStation)</code></td><td>註冊或以相同名稱更新一個站點</td></tr>
+<tr><td><code>unregister(String)</code></td><td>取消註冊；停止對外但保留設定檔</td></tr>
+<tr><td><code>isServed(String)</code></td><td>查詢站點是否正對外提供（已啟用且掛上）</td></tr>
+</table>
+
+<h3 id="zh-customstation-builder">CustomStation.builder</h3>
+<table>
+<tr><th>方法</th><th>必填</th><th>作用</th></tr>
+<tr><td><code>builder(name, plugin)</code></td><td>是</td><td>開始建立，指定站點名稱與來源插件</td></tr>
+<tr><td><code>.supplier(fn)</code></td><td>是</td><td>回傳資料的函式，純 Java 即可</td></tr>
+<tr><td><code>.description(text)</code></td><td>否</td><td>顯示在 <code>/api/v1</code> 索引上的說明</td></tr>
+<tr><td><code>.cached(seconds)</code></td><td>否</td><td>快照模式：主執行緒每幾秒呼叫一次</td></tr>
+<tr><td><code>.async()</code></td><td>否</td><td>即時模式（預設）：HTTP 執行緒上呼叫</td></tr>
+<tr><td><code>.build()</code></td><td>是</td><td>產生 CustomStation，交給 register</td></tr>
+</table>
+<p>不加 <code>.async()</code> 或 <code>.cached()</code> 時，預設就是即時模式。什麼時候該用哪個、
+供應者能回傳哪些型別，見<a href="../custom-stations/">第三方站點串接</a>。</p></div>
+      <div class="en"><p>This page is for plugin developers integrating with ServerAPI: how to add it to your project, and
+the API you get. For the full walkthrough, choosing a mode, and return types, see
+<a href="../custom-stations/">Third-party stations</a>.</p>
+
+<h3 id="en-adding-the-dependency">Adding the dependency</h3>
+<p>You need <code>ServerApiRegistry</code> and <code>CustomStation</code> from
+<code>kevin.serverapi.api</code> at compile time. Pick one of two ways, and <b>do not shade ServerAPI
+into your jar</b>; it is provided at runtime by the plugin on the server.</p>
+<p><b>Option 1: JitPack.</b> Add the repository and the <code>com.github</code> coordinates; JitPack
+builds it for you on first use:</p>
+<pre><code>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;jitpack.io&lt;/id&gt;
+        &lt;url&gt;https://jitpack.io&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;com.github.Kevin28576&lt;/groupId&gt;
+    &lt;artifactId&gt;ServerAPI&lt;/artifactId&gt;
+    &lt;version&gt;v1.1.0&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;exclusions&gt;
+        &lt;exclusion&gt;&lt;groupId&gt;*&lt;/groupId&gt;&lt;artifactId&gt;*&lt;/artifactId&gt;&lt;/exclusion&gt;
+    &lt;/exclusions&gt;
+&lt;/dependency&gt;</code></pre>
+<p><code>version</code> is the GitHub tag name (e.g. <code>v1.1.0</code>). The <code>exclusions</code>
+strip ServerAPI's own dependencies, since you only want the two interfaces.</p>
+<p><b>Option 2: copy the classes.</b> Copy <code>ServerApiRegistry.java</code> and
+<code>CustomStation.java</code> into your project. They depend only on Bukkit's <code>Plugin</code>, so
+they compile as-is.</p>
+
+<h3 id="en-serverapiregistry-2">ServerApiRegistry</h3>
+<p>ServerAPI registers it into Bukkit's <code>ServicesManager</code> when it enables. Look it up in your
+own <code>onEnable()</code> (which runs after ServerAPI):</p>
+<pre><code>var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+if (rsp == null) return;                 // No ServerAPI installed, just skip it
+ServerApiRegistry api = rsp.getProvider();</code></pre>
+<table>
+<tr><th>Method</th><th>What it does</th></tr>
+<tr><td><code>register(CustomStation)</code></td><td>Register, or update a station of the same name</td></tr>
+<tr><td><code>unregister(String)</code></td><td>Stop serving it, but keep the config file</td></tr>
+<tr><td><code>isServed(String)</code></td><td>Whether the station is currently served (enabled and mounted)</td></tr>
+</table>
+
+<h3 id="en-customstation-builder-2">CustomStation.builder</h3>
+<table>
+<tr><th>Method</th><th>Required</th><th>What it does</th></tr>
+<tr><td><code>builder(name, plugin)</code></td><td>Yes</td><td>Start building; the station name and owning plugin</td></tr>
+<tr><td><code>.supplier(fn)</code></td><td>Yes</td><td>The function returning the data, plain Java</td></tr>
+<tr><td><code>.description(text)</code></td><td>No</td><td>Shown in the <code>/api/v1</code> index</td></tr>
+<tr><td><code>.cached(seconds)</code></td><td>No</td><td>Cached mode: called on the main thread every few seconds</td></tr>
+<tr><td><code>.async()</code></td><td>No</td><td>Live mode (default): called on the HTTP thread</td></tr>
+<tr><td><code>.build()</code></td><td>Yes</td><td>Produce the CustomStation to pass to register</td></tr>
+</table>
+<p>With neither <code>.async()</code> nor <code>.cached()</code>, the default is live mode. For when to
+use which, and which return types the supplier may produce, see
+<a href="../custom-stations/">Third-party stations</a>.</p></div>
+    </article>
+<div class="pager"><a class="prev" href="../custom-stations/"><small><i>←</i><span class="zh">上一頁</span><span class="en">Previous</span></small><b><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></b></a><a class="next" href="../i18n/"><small><span class="zh">下一頁</span><span class="en">Next</span><i>→</i></small><b><span class="zh">多語言</span><span class="en">Languages</span></b></a></div>
+    <footer>
+      <div class="zh">ServerAPI · 僅供非商業用途，商業伺服器需另行取得授權。</div>
+      <div class="en">ServerAPI · Free for non-commercial use; commercial servers need a separate licence.</div>
+      <div class="copy">Copyright © 2021-2026 CloudXact Studio. All Rights Reserved.</div>
+    </footer>
+  </main>
+  <nav class="toc" id="toc"><div class="zh"><div class="toc-t">本頁內容</div><a href="#zh-導入依賴" data-h="zh-導入依賴" class="lv3">導入依賴</a><a href="#zh-serverapiregistry" data-h="zh-serverapiregistry" class="lv3">ServerApiRegistry</a><a href="#zh-customstation-builder" data-h="zh-customstation-builder" class="lv3">CustomStation.builder</a></div><div class="en"><div class="toc-t">On this page</div><a href="#en-adding-the-dependency" data-h="en-adding-the-dependency" class="lv3">Adding the dependency</a><a href="#en-serverapiregistry-2" data-h="en-serverapiregistry-2" class="lv3">ServerApiRegistry</a><a href="#en-customstation-builder-2" data-h="en-customstation-builder-2" class="lv3">CustomStation.builder</a></div></nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<script src="../assets/app.js"></script>
+</body>
+</html>

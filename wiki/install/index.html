@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Installation · ServerAPI</title>
-<meta name="description" content="Drop ServerAPI-1.0.0.jar into plugins/ Start the server to generate plugins/ServerAPI/config.yml Check http.port — the default 8080 clashes with a lot">
+<meta name="description" content="Drop ServerAPI-1.1.0.jar into plugins/ Start the server to generate plugins/ServerAPI/config.yml Check http.port — the default 8080 clashes with a lot">
 <link rel="icon" type="image/png" href="../assets/icon.png">
 <link rel="apple-touch-icon" href="../assets/icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ServerAPI">
 <meta property="og:title" content="Installation · ServerAPI">
-<meta property="og:description" content="Drop ServerAPI-1.0.0.jar into plugins/ Start the server to generate plugins/ServerAPI/config.yml Check http.port — the default 8080 clashes with a lot">
+<meta property="og:description" content="Drop ServerAPI-1.1.0.jar into plugins/ Start the server to generate plugins/ServerAPI/config.yml Check http.port — the default 8080 clashes with a lot">
 <meta property="og:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Installation · ServerAPI">
-<meta name="twitter:description" content="Drop ServerAPI-1.0.0.jar into plugins/ Start the server to generate plugins/ServerAPI/config.yml Check http.port — the default 8080 clashes with a lot">
+<meta name="twitter:description" content="Drop ServerAPI-1.1.0.jar into plugins/ Start the server to generate plugins/ServerAPI/config.yml Check http.port — the default 8080 clashes with a lot">
 <meta name="twitter:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
 <meta name="theme-color" content="#4cc2ff">
 <link rel="stylesheet" href="../assets/style.css">
@@ -27,7 +27,7 @@
 <header class="top"><div class="top-in">
   <button class="menu" id="menu" aria-label="Menu">☰</button>
   <a class="brand" href="../"><img src="../assets/icon.png" alt="" width="22" height="22">
-    ServerAPI<span class="v">v1.0.0</span></a>
+    ServerAPI<span class="v">v1.1.0</span></a>
   <div class="search">
     <input id="q" type="search" autocomplete="off">
     <div id="results"></div>
@@ -63,6 +63,8 @@
 <a href="../web/"><span class="zh">網頁介面</span><span class="en">Web pages</span></a>
 <a href="../storage/"><span class="zh">資料儲存</span><span class="en">Storage</span></a>
 <a href="../network/"><span class="zh">多服</span><span class="en">Multi-server</span></a>
+<a href="../custom-stations/"><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></a>
+<a href="../developer-api/"><span class="zh">開發者 API</span><span class="en">Developer API</span></a>
 <a href="../i18n/"><span class="zh">多語言</span><span class="en">Languages</span></a>
 <div class="grp"><span class="zh">參考</span><span class="en">Reference</span></div>
 <a href="../commands/"><span class="zh">指令與權限</span><span class="en">Commands and permissions</span></a>
@@ -74,7 +76,7 @@
 
       <h1><span class="zh">安裝</span><span class="en">Installation</span></h1>
       <div class="zh"><ol>
-  <li>下載 <code>ServerAPI-1.0.0.jar</code> 放進 <code>plugins/</code></li>
+  <li>下載 <code>ServerAPI-1.1.0.jar</code> 放進 <code>plugins/</code></li>
   <li>啟動伺服器，產生 <code>plugins/ServerAPI/config.yml</code></li>
   <li>確認 <code>http.port</code>，預設 8080 常與其他服務衝突</li>
   <li>測試：<code>curl http://localhost:8080/api/v1</code></li>
@@ -84,7 +86,7 @@
   PluginLoader 於首次啟動時自 Maven 下載，不打包在 jar 內。離線環境或防火牆擋住時插件會啟動失敗。
 </div></div>
       <div class="en"><ol>
-  <li>Drop <code>ServerAPI-1.0.0.jar</code> into <code>plugins/</code></li>
+  <li>Drop <code>ServerAPI-1.1.0.jar</code> into <code>plugins/</code></li>
   <li>Start the server to generate <code>plugins/ServerAPI/config.yml</code></li>
   <li>Check <code>http.port</code> — the default 8080 clashes with a lot of software</li>
   <li>Test it: <code>curl http://localhost:8080/api/v1</code></li>

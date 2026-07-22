@@ -27,7 +27,7 @@
 <header class="top"><div class="top-in">
   <button class="menu" id="menu" aria-label="Menu">☰</button>
   <a class="brand" href="../"><img src="../assets/icon.png" alt="" width="22" height="22">
-    ServerAPI<span class="v">v1.0.0</span></a>
+    ServerAPI<span class="v">v1.1.0</span></a>
   <div class="search">
     <input id="q" type="search" autocomplete="off">
     <div id="results"></div>
@@ -63,6 +63,8 @@
 <a href="../web/"><span class="zh">網頁介面</span><span class="en">Web pages</span></a>
 <a href="../storage/"><span class="zh">資料儲存</span><span class="en">Storage</span></a>
 <a href="../network/"><span class="zh">多服</span><span class="en">Multi-server</span></a>
+<a href="../custom-stations/"><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></a>
+<a href="../developer-api/"><span class="zh">開發者 API</span><span class="en">Developer API</span></a>
 <a href="../i18n/"><span class="zh">多語言</span><span class="en">Languages</span></a>
 <div class="grp"><span class="zh">參考</span><span class="en">Reference</span></div>
 <a href="../commands/"><span class="zh">指令與權限</span><span class="en">Commands and permissions</span></a>
@@ -79,9 +81,9 @@ curl "http://localhost:8080/api/v1/plugins?key=&lt;金鑰&gt;"</code></pre>
 <div class="note">網址會留在瀏覽器歷史與反向代理的存取記錄裡。正式串接請用標頭，網址參數主要方便測試。</div>
 <img class="shot" src="../assets/gallery/security-zh.png" alt="三層存取控管：端點層、欄位層、回應偽裝" width="1600" height="900" loading="lazy">
 <h3 id="zh-三層控管">三層控管</h3>
-<p><b>端點層</b> —— <code>auth.require-key.&lt;端點&gt;</code> 逐一決定。
+<p><b>端點層</b>由 <code>auth.require-key.&lt;端點&gt;</code> 逐一決定。
 <b>未列出的端點預設需要金鑰</b>，新端點不會意外公開。</p>
-<p><b>欄位層</b> —— <code>auth.protected-fields.&lt;端點&gt;</code> 指定「端點公開、但這些欄位要藏起來」。
+<p><b>欄位層</b>用 <code>auth.protected-fields.&lt;端點&gt;</code> 指定「端點公開、但這些欄位要藏起來」。
 欄位名在任意層級比對並移除，被隱藏的欄位會列在 <code>meta.hiddenFields</code>。</p>
 <pre><code>protected-fields:
   server: ["motd", "ip", "port"]
@@ -89,10 +91,10 @@ curl "http://localhost:8080/api/v1/plugins?key=&lt;金鑰&gt;"</code></pre>
   player: ["op", "banned", "discord"]</code></pre>
 <div class="note">
   <code>/player</code> 預設藏起 <code>op</code> 與 <code>banned</code> 是有原因的：這兩項在
-  <code>/operators</code>、<code>/bans</code> 都需要金鑰，不擋等於留一扇後門 —— 從公開的
+  <code>/operators</code>、<code>/bans</code> 都需要金鑰，不擋等於留一扇後門，別人能從公開的
   <code>/status</code> 取得線上 UUID，再逐一查 <code>/player</code> 就能還原那兩份名單。
 </div>
-<p><b>回應偽裝</b> —— <code>auth.hide-protected</code> 開啟時，未授權的請求會收到 404 而非 401。
+<p><b>回應偽裝</b>：<code>auth.hide-protected</code> 開啟時，未授權的請求會收到 404 而非 401。
 回 401 等於告訴對方「這裡有值得保護的東西」並替他標出目標。此時索引也不會列出受保護的端點。</p>
 <div class="warn">
   <b><code>auth.enabled</code> 為 <code>false</code> 時整套驗證關閉</b>，上述設定一律不生效，

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="zh-Hant" data-lang="zh" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Third-party stations · ServerAPI</title>
+<meta name="description" content="Other plugins can plug their own data into ServerAPI and have it served alongside the built-in endpoints, at /api/v1/custom/&lt;name&gt; . But whether it op">
+<link rel="icon" type="image/png" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ServerAPI">
+<meta property="og:title" content="Third-party stations · ServerAPI">
+<meta property="og:description" content="Other plugins can plug their own data into ServerAPI and have it served alongside the built-in endpoints, at /api/v1/custom/&lt;name&gt; . But whether it op">
+<meta property="og:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Third-party stations · ServerAPI">
+<meta name="twitter:description" content="Other plugins can plug their own data into ServerAPI and have it served alongside the built-in endpoints, at /api/v1/custom/&lt;name&gt; . But whether it op">
+<meta name="twitter:image" content="https://cloudxact.com/wiki/serverapi/assets/og.png">
+<meta name="theme-color" content="#4cc2ff">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="top"><div class="top-in">
+  <button class="menu" id="menu" aria-label="Menu">☰</button>
+  <a class="brand" href="../"><img src="../assets/icon.png" alt="" width="22" height="22">
+    ServerAPI<span class="v">v1.1.0</span></a>
+  <div class="search">
+    <input id="q" type="search" autocomplete="off">
+    <div id="results"></div>
+  </div>
+  <nav class="links">
+    <a class="ico" href="https://github.com/Kevin28576/ServerAPI" title="GitHub" aria-label="GitHub"
+       target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+    <a class="ico" href="https://discord.gg/JyQPpVrhsk" title="Discord" aria-label="Discord"
+       target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></a>
+    <a class="dl" href="https://modrinth.com/plugin/paper-serverapi" title="Modrinth" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12.252.004a11.78 11.768 0 0 0-8.92 3.73 11 10.999 0 0 0-2.17 3.11 11.37 11.359 0 0 0-1.16 5.169c0 1.42.17 2.5.6 3.77.24.759.77 1.899 1.17 2.529a12.3 12.298 0 0 0 8.85 5.639c.44.05 2.54.07 2.76.02.2-.04.22.1-.26-1.7l-.36-1.37-1.01-.06a8.5 8.489 0 0 1-5.18-1.8 5.34 5.34 0 0 1-1.3-1.26c0-.05.34-.28.74-.5a37.572 37.545 0 0 1 2.88-1.629c.03 0 .5.45 1.06.98l1 .97 2.07-.43 2.06-.43 1.47-1.47c.8-.8 1.48-1.5 1.48-1.52 0-.09-.42-1.63-.46-1.7-.04-.06-.2-.03-1.02.18-.53.13-1.2.3-1.45.4l-.48.15-.53.53-.53.53-.93.1-.93.07-.52-.5a2.7 2.7 0 0 1-.96-1.7l-.13-.6.43-.57c.68-.9.68-.9 1.46-1.1.4-.1.65-.2.83-.33.13-.099.65-.579 1.14-1.069l.9-.9-.7-.7-.7-.7-1.95.54c-1.07.3-1.96.53-1.97.53-.03 0-2.23 2.48-2.63 2.97l-.29.35.28 1.03c.16.56.3 1.16.31 1.34l.03.3-.34.23c-.37.23-2.22 1.3-2.84 1.63-.36.2-.37.2-.44.1-.08-.1-.23-.6-.32-1.03-.18-.86-.17-2.75.02-3.73a8.84 8.839 0 0 1 7.9-6.93c.43-.03.77-.08.78-.1.06-.17.5-2.999.47-3.039-.01-.02-.1-.02-.2-.03Zm3.68.67c-.2 0-.3.1-.37.38-.06.23-.46 2.42-.46 2.52 0 .04.1.11.22.16a8.51 8.499 0 0 1 2.99 2 8.38 8.379 0 0 1 2.16 3.449 6.9 6.9 0 0 1 .4 2.8c0 1.07 0 1.27-.1 1.73a9.37 9.369 0 0 1-1.76 3.769c-.32.4-.98 1.06-1.37 1.38-.38.32-1.54 1.1-1.7 1.14-.1.03-.1.06-.07.26.03.18.64 2.56.7 2.78l.06.06a12.07 12.058 0 0 0 7.27-9.4c.13-.77.13-2.58 0-3.4a11.96 11.948 0 0 0-5.73-8.578c-.7-.42-2.05-1.06-2.25-1.06Z"/></svg><span
+       class="zh">下載</span><span class="en">Download</span></a>
+  </nav>
+  <span class="sep" aria-hidden="true"></span>
+  <div class="langs">
+    <button data-set="zh">中文</button>
+    <button data-set="en">English</button>
+  </div>
+</div></header>
+
+<div class="layout">
+  <aside id="side">
+<div class="grp"><span class="zh">開始</span><span class="en">Getting started</span></div>
+<a href="../"><span class="zh">總覽</span><span class="en">Overview</span></a>
+<a href="../install/"><span class="zh">安裝</span><span class="en">Installation</span></a>
+<div class="grp"><span class="zh">API</span><span class="en">API</span></div>
+<a href="../endpoints/"><span class="zh">端點</span><span class="en">Endpoints</span></a>
+<a href="../response/"><span class="zh">回應格式</span><span class="en">Response format</span></a>
+<div class="grp"><span class="zh">安全</span><span class="en">Security</span></div>
+<a href="../auth/"><span class="zh">驗證與權限</span><span class="en">Authentication</span></a>
+<a href="../ratelimit/"><span class="zh">速率限制與反向代理</span><span class="en">Rate limiting and proxies</span></a>
+<div class="grp"><span class="zh">功能</span><span class="en">Features</span></div>
+<a href="../punishments/"><span class="zh">處罰紀錄</span><span class="en">Punishment records</span></a>
+<a href="../web/"><span class="zh">網頁介面</span><span class="en">Web pages</span></a>
+<a href="../storage/"><span class="zh">資料儲存</span><span class="en">Storage</span></a>
+<a href="../network/"><span class="zh">多服</span><span class="en">Multi-server</span></a>
+<a href="../custom-stations/" class="on"><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></a>
+<a href="../developer-api/"><span class="zh">開發者 API</span><span class="en">Developer API</span></a>
+<a href="../i18n/"><span class="zh">多語言</span><span class="en">Languages</span></a>
+<div class="grp"><span class="zh">參考</span><span class="en">Reference</span></div>
+<a href="../commands/"><span class="zh">指令與權限</span><span class="en">Commands and permissions</span></a>
+<a href="../integrations/"><span class="zh">第三方整合</span><span class="en">Integrations</span></a>
+<a href="../troubleshooting/"><span class="zh">疑難排解</span><span class="en">Troubleshooting</span></a>
+  </aside>
+  <main>
+    <article>
+
+      <h1><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></h1>
+      <div class="zh"><p>別的插件可以把自己的資料，接到 ServerAPI 上一起對外，網址是
+<code>/api/v1/custom/&lt;名稱&gt;</code>。但<b>要不要開、要不要金鑰，都是你（伺服器管理員）說了算</b>。
+插件只能「申請」，沒辦法自己把資料公開出去。</p>
+<div class="warn">
+  <b>裝好預設是關的。</b>插件第一次申請時，ServerAPI 只會在
+  <code>plugins/ServerAPI/custom/</code> 底下放一個關著的設定檔，並在後台提醒你。
+  你看過、把 <code>enabled</code> 改成 <code>true</code> 再重載，資料才會真的出現在 API 上。
+</div>
+
+<h3 id="zh-給寫插件的人">給寫插件的人</h3>
+<p>ServerAPI 一啟用，就會把註冊入口掛到 Bukkit 的 <code>ServicesManager</code>。
+在你插件的 <code>onEnable()</code> 裡拿到它，最少只要兩樣東西：站點名稱，和一個回傳資料的函式。</p>
+<pre><code>var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+if (rsp == null) return;                 // 沒裝 ServerAPI，就當作沒這回事
+ServerApiRegistry api = rsp.getProvider();
+
+api.register(CustomStation.builder("myplugin_stats", this)
+        .supplier(() -&gt; Map.of("kills", killCount, "wins", winCount))
+        .build());</code></pre>
+<p>這樣就好。等伺服器管理員開啟後，資料就會出現在 <code>/api/v1/custom/myplugin_stats</code>，
+你回傳的 <code>Map</code> 會自動變成 JSON。</p>
+
+<h3 id="zh-要放玩家或世界的資料">要放玩家或世界的資料？</h3>
+<p>上面那種寫法，你的函式是在<b>處理 HTTP 請求的執行緒</b>上跑的，這條執行緒<b>不能碰 Bukkit 的東西</b>，
+因為玩家、世界、實體這些只有主執行緒讀才安全。如果你要放的正是這類資料，加一行
+<code>.cached(秒數)</code>：ServerAPI 會改成在主執行緒上、每隔幾秒幫你抓一次存起來，之後有人來讀就給快取。</p>
+<pre><code>api.register(CustomStation.builder("arena", this)
+        .cached(5)                       // 每 5 秒在主執行緒抓一次
+        .supplier(() -&gt; {
+            World w = Bukkit.getWorld("arena");
+            return Map.of("players", w.getPlayers().size(), "time", w.getTime());
+        })
+        .build());</code></pre>
+<p>簡單說，資料本來就在記憶體、算得快，什麼都不用加，預設就是即時；
+要讀玩家、世界、實體，才加 <code>.cached(秒)</code>。那個秒數只是建議值，伺服器管理員能自己改。</p>
+
+<h3 id="zh-完整範例">完整範例</h3>
+<p>一支只做這件事的小插件，大概長這樣：</p>
+<pre><code>public class MyPlugin extends JavaPlugin {
+
+    private int kills = 0;
+    private final UUID matchId = UUID.randomUUID();
+
+    @Override
+    public void onEnable() {
+        var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+        if (rsp == null) {
+            getLogger().info("沒裝 ServerAPI，略過資料串接。");
+            return;
+        }
+        rsp.getProvider().register(CustomStation.builder("myplugin_stats", this)
+                .description("我的插件統計")     // 選填，會顯示在 /api/v1 索引上
+                .supplier(this::snapshot)
+                .build());
+    }
+
+    // 各種型別都能直接回傳，ServerAPI 會遞迴轉成 JSON。
+    // 要放 null 得用 LinkedHashMap，因為 Map.of 不接受 null。
+    private Map&lt;String, Object&gt; snapshot() {
+        Map&lt;String, Object&gt; data = new LinkedHashMap&lt;&gt;();
+        data.put("kills", kills);                             // 數字（整數）
+        data.put("kdr", 2.4);                                 // 數字（小數）
+        data.put("ranked", true);                             // 布林
+        data.put("topPlayer", "Alice");                       // 字串
+        data.put("recentPlayers", List.of("Alice", "Bob"));   // 陣列（List）
+        data.put("lastScores", new int[]{10, 8, 5});          // 陣列（int[] 也行）
+        data.put("arena", Map.of("name", "sky", "round", 3)); // 巢狀物件（Map）
+        data.put("matchId", matchId);                         // 其他型別（UUID）自動轉字串
+        data.put("nextEvent", null);                          // null
+        return data;
+    }
+
+    @Override
+    public void onDisable() {
+        var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+        if (rsp != null) rsp.getProvider().unregister("myplugin_stats");
+    }
+}</code></pre>
+<p>如上，回傳值可以是 <code>Map</code>、<code>List</code>、陣列、數字、小數、布林、字串、
+<code>null</code>，其他型別會自動轉成字串，全都是純 Java。
+<code>unregister</code> 會停止對外，但伺服器管理員的設定檔會留著，下次開插件不必重設。</p>
+<p>怎麼把 ServerAPI 加進你的專案、以及完整的 API 參考，見<a href="../developer-api/">開發者 API</a>。
+更長的教學與常見問題見
+<a href="https://github.com/Kevin28576/ServerAPI/blob/main/docs/THIRD_PARTY_STATIONS.md">串接文件</a>。</p>
+
+<h3 id="zh-給伺服器管理員-你會看到什麼">給伺服器管理員：你會看到什麼</h3>
+<p>插件一申請，後台就會提示，並產生一個設定檔（一個站點一個檔，檔名就是站點名）：</p>
+<pre><code># plugins/ServerAPI/custom/myplugin_stats.yml
+# 有個插件想透過 ServerAPI 對外提供資料，所以自動建立了這個檔案。
+# 預設是關的：看過內容覺得沒問題，就把 enabled 改成 true、再執行 /serverapi reload。
+plugin: CoolPlugin
+path: /api/v1/custom/myplugin_stats
+mode: async
+registered-at: 2026-07-23T10:00:00
+
+enabled: false           # false＝這個網址打不開（回 404）；改成 true 才會真的對外
+require-key: true        # true＝要帶 API 金鑰才讀得到；false＝誰都能讀
+protected-fields: []     # 沒帶金鑰的人看不到這些欄位，例如 [balance]；留空就是全公開</code></pre>
+<p>要開啟：<code>enabled</code> 改成 <code>true</code>，跑一次 <code>/serverapi reload</code>。
+開了以後，這個站點會出現在 <code>/api/v1</code> 索引，並套用你原本的
+<a href="../auth/">三層存取控管</a>（金鑰、隱藏欄位、未授權回 404），跟內建端點一模一樣。</p>
+<p>如果這個站點是 <code>cached</code> 模式，設定檔會多一行 <code>snapshot-seconds</code>，
+用來調它多久更新一次；<code>async</code> 模式即時讀取，沒有這一行。</p>
+<div class="note">
+  最上面 <code>plugin</code>／<code>path</code>／<code>mode</code>／<code>registered-at</code> 只是資訊，
+  插件每次註冊都會蓋回，改了沒用；你真正要動的只有下面四行。
+</div></div>
+      <div class="en"><p>Other plugins can plug their own data into ServerAPI and have it served alongside the built-in
+endpoints, at <code>/api/v1/custom/&lt;name&gt;</code>. But <b>whether it opens, and whether it needs a
+key, is entirely your call</b> — a plugin can only <em>ask</em>; it cannot make its data public by
+itself.</p>
+<div class="warn">
+  <b>It starts off.</b> The first time a plugin asks, ServerAPI just drops a closed config file into
+  <code>plugins/ServerAPI/custom/</code> and tells you in the console. Only after you look it over, set
+  <code>enabled</code> to <code>true</code> and reload does the data actually appear on the API.
+</div>
+
+<h3 id="en-for-plugin-developers">For plugin developers</h3>
+<p>ServerAPI puts the registration entry point into Bukkit's <code>ServicesManager</code> when it
+enables. Grab it in your plugin's <code>onEnable()</code>. The minimum is two things: a station name
+and a function that returns the data.</p>
+<pre><code>var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+if (rsp == null) return;                 // No ServerAPI installed — just skip it
+ServerApiRegistry api = rsp.getProvider();
+
+api.register(CustomStation.builder("myplugin_stats", this)
+        .supplier(() -&gt; Map.of("kills", killCount, "wins", winCount))
+        .build());</code></pre>
+<p>That is all. Once the owner enables it, the data shows up at
+<code>/api/v1/custom/myplugin_stats</code>, and the <code>Map</code> you return becomes JSON
+automatically.</p>
+
+<h3 id="en-exposing-player-or-world-data">Exposing player or world data?</h3>
+<p>With the code above, your function runs on the <b>HTTP request thread</b>, and that thread
+<b>must not touch Bukkit</b> — players, worlds and entities are only safe to read on the main thread.
+If that is exactly the kind of data you want to expose, add one line, <code>.cached(seconds)</code>:
+ServerAPI then calls your function on the main thread every few seconds, stores the result, and serves
+that snapshot to readers.</p>
+<pre><code>api.register(CustomStation.builder("arena", this)
+        .cached(5)                       // grab it on the main thread every 5s
+        .supplier(() -&gt; {
+            World w = Bukkit.getWorld("arena");
+            return Map.of("players", w.getPlayers().size(), "time", w.getTime());
+        })
+        .build());</code></pre>
+<p>In one line: if the data is already in memory and cheap to build, add nothing (live is the default);
+add <code>.cached(seconds)</code> only when you need player / world / entity data. That number is just a
+suggestion — the owner can change it.</p>
+
+<h3 id="en-a-full-example">A full example</h3>
+<p>A small plugin that does nothing but this looks about like:</p>
+<pre><code>public class MyPlugin extends JavaPlugin {
+
+    private int kills = 0;
+    private final UUID matchId = UUID.randomUUID();
+
+    @Override
+    public void onEnable() {
+        var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+        if (rsp == null) {
+            getLogger().info("No ServerAPI, skipping data integration.");
+            return;
+        }
+        rsp.getProvider().register(CustomStation.builder("myplugin_stats", this)
+                .description("My plugin stats")   // optional, shown in the /api/v1 index
+                .supplier(this::snapshot)
+                .build());
+    }
+
+    // Any of these types can be returned directly; ServerAPI converts to JSON recursively.
+    // Use a LinkedHashMap if you need a null value, since Map.of rejects null.
+    private Map&lt;String, Object&gt; snapshot() {
+        Map&lt;String, Object&gt; data = new LinkedHashMap&lt;&gt;();
+        data.put("kills", kills);                             // number (int)
+        data.put("kdr", 2.4);                                 // number (double)
+        data.put("ranked", true);                             // boolean
+        data.put("topPlayer", "Alice");                       // string
+        data.put("recentPlayers", List.of("Alice", "Bob"));   // array (List)
+        data.put("lastScores", new int[]{10, 8, 5});          // array (int[] works too)
+        data.put("arena", Map.of("name", "sky", "round", 3)); // nested object (Map)
+        data.put("matchId", matchId);                         // other types (UUID) become a string
+        data.put("nextEvent", null);                          // null
+        return data;
+    }
+
+    @Override
+    public void onDisable() {
+        var rsp = getServer().getServicesManager().getRegistration(ServerApiRegistry.class);
+        if (rsp != null) rsp.getProvider().unregister("myplugin_stats");
+    }
+}</code></pre>
+<p>As above, the return value can be a <code>Map</code>, <code>List</code>, array, number, boolean,
+string or <code>null</code>, and any other type becomes a string. All plain Java.
+<code>unregister</code> stops serving but keeps the owner's config file, so nothing has to be
+reconfigured next time.</p>
+<p>For how to add ServerAPI to your project and the full API reference, see
+<a href="../developer-api/">Developer API</a>. For a longer walkthrough and FAQ, see the
+<a href="https://github.com/Kevin28576/ServerAPI/blob/main/docs/THIRD_PARTY_STATIONS.md">integration
+guide</a>.</p>
+
+<h3 id="en-for-the-owner-what-you-see">For the owner: what you see</h3>
+<p>The moment a plugin asks, the console tells you and a config file appears — one file per station,
+named after the station:</p>
+<pre><code># plugins/ServerAPI/custom/myplugin_stats.yml
+# A plugin asked to expose its data through ServerAPI, so this file was created for it.
+# It starts off: once you are happy with it, set enabled to true and run /serverapi reload.
+plugin: CoolPlugin
+path: /api/v1/custom/myplugin_stats
+mode: async
+registered-at: 2026-07-23T10:00:00
+
+enabled: false           # false = the URL is closed (404); set true to actually serve it
+require-key: true        # true = an API key is required; false = anyone can read it
+protected-fields: []     # fields hidden from callers without a key, e.g. [balance]; [] shows all</code></pre>
+<p>To turn it on: set <code>enabled</code> to <code>true</code> and run <code>/serverapi reload</code>.
+Once enabled the station shows up in the <code>/api/v1</code> index and obeys your existing
+<a href="../auth/">three layers of access control</a> (key, hidden fields, 404 for unauthorised
+requests), exactly like the built-in endpoints.</p>
+<p>A <code>cached</code> station's file has one extra line, <code>snapshot-seconds</code>, controlling
+how often it refreshes; an <code>async</code> station reads live and has no such line.</p>
+<div class="note">
+  The top <code>plugin</code> / <code>path</code> / <code>mode</code> / <code>registered-at</code> lines
+  are just information and get overwritten on every registration; the only lines you change are the
+  four below them.
+</div></div>
+    </article>
+<div class="pager"><a class="prev" href="../network/"><small><i>←</i><span class="zh">上一頁</span><span class="en">Previous</span></small><b><span class="zh">多服</span><span class="en">Multi-server</span></b></a><a class="next" href="../developer-api/"><small><span class="zh">下一頁</span><span class="en">Next</span><i>→</i></small><b><span class="zh">開發者 API</span><span class="en">Developer API</span></b></a></div>
+    <footer>
+      <div class="zh">ServerAPI · 僅供非商業用途，商業伺服器需另行取得授權。</div>
+      <div class="en">ServerAPI · Free for non-commercial use; commercial servers need a separate licence.</div>
+      <div class="copy">Copyright © 2021-2026 CloudXact Studio. All Rights Reserved.</div>
+    </footer>
+  </main>
+  <nav class="toc" id="toc"><div class="zh"><div class="toc-t">本頁內容</div><a href="#zh-給寫插件的人" data-h="zh-給寫插件的人" class="lv3">給寫插件的人</a><a href="#zh-要放玩家或世界的資料" data-h="zh-要放玩家或世界的資料" class="lv3">要放玩家或世界的資料？</a><a href="#zh-完整範例" data-h="zh-完整範例" class="lv3">完整範例</a><a href="#zh-給伺服器管理員-你會看到什麼" data-h="zh-給伺服器管理員-你會看到什麼" class="lv3">給伺服器管理員：你會看到什麼</a></div><div class="en"><div class="toc-t">On this page</div><a href="#en-for-plugin-developers" data-h="en-for-plugin-developers" class="lv3">For plugin developers</a><a href="#en-exposing-player-or-world-data" data-h="en-exposing-player-or-world-data" class="lv3">Exposing player or world data?</a><a href="#en-a-full-example" data-h="en-a-full-example" class="lv3">A full example</a><a href="#en-for-the-owner-what-you-see" data-h="en-for-the-owner-what-you-see" class="lv3">For the owner: what you see</a></div></nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<script src="../assets/app.js"></script>
+</body>
+</html>

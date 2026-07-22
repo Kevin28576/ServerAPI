@@ -27,7 +27,7 @@
 <header class="top"><div class="top-in">
   <button class="menu" id="menu" aria-label="Menu">☰</button>
   <a class="brand" href="../"><img src="../assets/icon.png" alt="" width="22" height="22">
-    ServerAPI<span class="v">v1.0.0</span></a>
+    ServerAPI<span class="v">v1.1.0</span></a>
   <div class="search">
     <input id="q" type="search" autocomplete="off">
     <div id="results"></div>
@@ -63,6 +63,8 @@
 <a href="../web/"><span class="zh">網頁介面</span><span class="en">Web pages</span></a>
 <a href="../storage/"><span class="zh">資料儲存</span><span class="en">Storage</span></a>
 <a href="../network/"><span class="zh">多服</span><span class="en">Multi-server</span></a>
+<a href="../custom-stations/"><span class="zh">第三方站點串接</span><span class="en">Third-party stations</span></a>
+<a href="../developer-api/"><span class="zh">開發者 API</span><span class="en">Developer API</span></a>
 <a href="../i18n/"><span class="zh">多語言</span><span class="en">Languages</span></a>
 <div class="grp"><span class="zh">參考</span><span class="en">Reference</span></div>
 <a href="../commands/"><span class="zh">指令與權限</span><span class="en">Commands and permissions</span></a>
@@ -75,12 +77,12 @@
       <h1><span class="zh">處罰紀錄</span><span class="en">Punishment records</span></h1>
       <div class="zh"><p><code>/punishments</code> 彙整封鎖、IP 封鎖、臨時封鎖、踢出、警告、禁言與監禁，
 並附上統計（總數、受罰人數、目前生效中）。</p>
-<p>紀錄<b>永久保留</b> —— 解封或到期的項目仍會列出，只是狀態改為已解除／已到期，
+<p>紀錄<b>永久保留</b>，解封或到期的項目仍會列出，只是狀態改為已解除／已到期，
 適合做公開的處罰查詢頁。</p>
 <pre><code>punishment-log:
   retention-days: 90        # 0 或負數 = 永久保存</code></pre>
 <h3 id="zh-資料從哪來">資料從哪來</h3>
-<p>定期與封鎖名單及 CMI <b>對帳</b>，而不是攔截指令 —— 因此不論處罰是用什麼方式下的都會被記錄。</p>
+<p>定期與封鎖名單及 CMI <b>對帳</b>，而不是攔截指令，因此不論處罰是用什麼方式下的都會被記錄。</p>
 <div class="note">
   Minecraft 與 CMI 都不保存踢出歷史，那部分由本插件監聽事件自行記錄，
   因此<b>只涵蓋插件啟用之後發生的踢出</b>，過去的無法追溯。

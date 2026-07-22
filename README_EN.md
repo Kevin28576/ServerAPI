@@ -8,7 +8,7 @@ A REST API allowing websites, Discord bots and dashboards to read live data from
 
 [![Paper](https://img.shields.io/badge/Paper-26.1-blue)](https://papermc.io)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange)](https://adoptium.net)
-[![Version](https://img.shields.io/badge/version-1.0.0-green)](https://github.com/Kevin28576/ServerAPI/releases)
+[![Version](https://img.shields.io/badge/version-1.1.0-green)](https://github.com/Kevin28576/ServerAPI/releases)
 [![Modrinth](https://img.shields.io/badge/Modrinth-Download-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/paper-serverapi)
 
 ```bash
@@ -37,7 +37,7 @@ Every player field is a **UUID**.
 
 ## Installation
 
-1. Drop `ServerAPI-1.0.0.jar` into `plugins/`
+1. Drop `ServerAPI-1.1.0.jar` into `plugins/`
 2. Start the server to generate `plugins/ServerAPI/config.yml`
 3. Check `http.port` — **the default 8080 often clashes with other services**
 4. `curl http://localhost:8080/api/v1`
@@ -270,7 +270,7 @@ Java 21, so running it only needs Java 21 or newer.
 mvn clean package
 ```
 
-Output: `target/ServerAPI-1.0.0.jar`
+Output: `target/ServerAPI-1.1.0.jar`
 
 ## Licence
 
