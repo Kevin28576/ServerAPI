@@ -81,6 +81,8 @@ public final class ServerAPIPlugin extends JavaPlugin {
     private static final String MODRINTH_URL = "https://modrinth.com/plugin/paper-serverapi";
     private static final String DISCORD_URL = "https://discord.gg/JyQPpVrhsk";
 
+    private static ServerAPIPlugin INSTANCE;
+
     /**
      * bStats 專案編號，於 bstats.org 註冊插件後取得。填錯會把資料送到別人的圖表上，
      * 因此無效時直接跳過統計。
@@ -156,6 +158,7 @@ public final class ServerAPIPlugin extends JavaPlugin {
         registerCommands();
         startHttp();
         setupMetrics();
+        INSTANCE = this;
     }
 
     /**
@@ -1306,5 +1309,9 @@ public final class ServerAPIPlugin extends JavaPlugin {
                 reloading.set(false);
             }
         });
+    }
+
+    public static ServerAPIPlugin getInstance() {
+        return INSTANCE;
     }
 }
