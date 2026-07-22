@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import kevin.serverapi.customapi.CustomAPIManager;
 import kevin.serverapi.http.handlers.BansHandler;
 import kevin.serverapi.http.handlers.ConstantsHandler;
 import kevin.serverapi.http.handlers.DocsHandler;
@@ -98,6 +99,7 @@ public final class ServerAPIPlugin extends JavaPlugin {
     /** 每個快照站點各自的定期任務（各有獨立間隔），外加 onlineCount 更新任務。 */
     private final List<BukkitTask> refreshTasks = new ArrayList<>();
     private BukkitTask historyTask;
+    private CustomAPIManager customAPIManager;
     private final AtomicBoolean reloading = new AtomicBoolean(false);
 
     private volatile HistoryService historyService;   // 可為 null（未啟用）；跨執行緒讀取
@@ -159,6 +161,7 @@ public final class ServerAPIPlugin extends JavaPlugin {
         startHttp();
         setupMetrics();
         INSTANCE = this;
+        customAPIManager = new CustomAPIManager();
     }
 
     /**
@@ -1313,5 +1316,9 @@ public final class ServerAPIPlugin extends JavaPlugin {
 
     public static ServerAPIPlugin getInstance() {
         return INSTANCE;
+    }
+
+    public CustomAPIManager getCustomAPIManager() {
+        return this.customAPIManager;
     }
 }
